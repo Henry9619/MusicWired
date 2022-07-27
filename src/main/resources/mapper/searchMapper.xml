@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.searchDAO">
+
+<!-- <select id="search" parameterType="String" resultType="search">
+	SELECT * FROM (SELECT * FROM MUSIC WHERE MUNAME LIKE '%'||#{keyword}||'%' ORDER BY MUNAME ASC)WHERE ROWNUM <![CDATA[ < ]]>=10         
+</select>  -->
+
+
+<select id="search2" parameterType="String" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUNAME LIKE '%'||#{keyword}||'%'
+</select>
+
+<select id="search3" parameterType="String" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUSINGER LIKE '%'||#{keyword}||'%'
+</select>
+
+<!-- <select id="songSearch" parameterType="paging" resultType="audio">
+ SELECT * FROM(SELECT MUSIC.*,ROW_NUMBER() OVER(ORDER BY MUNAME ASC) AS RN FROM MUSIC WHERE MUNAME LIKE '%'||#{mId}||'%')WHERE RN BETWEEN  #{startRow} AND #{endRow}
+</select>
+
+<select id="singerSearch" parameterType="paging" resultType="audio">
+SELECT * FROM(SELECT MUSIC.*,ROW_NUMBER() OVER(ORDER BY MUNAME ASC) AS RN FROM MUSIC WHERE MUSINGER LIKE '%'||#{mId}||'%')WHERE RN BETWEEN  #{startRow} AND #{endRow}
+</select> -->
+
+<insert id="searchInsert" parameterType="String"  >
+	INSERT INTO SEARCH VALUES(#{keyword},SYSDATE)
+</insert>
+
+<select id="searchRank"  resultType="search">
+	  SELECT * FROM(SELECT KEYWORD , COUNT(KEYWORD)FROM  SEARCH  GROUP BY KEYWORD ORDER BY COUNT(KEYWORD) DESC)WHERE ROWNUM<![CDATA[ < ]]>=10
+</select>
+
+<select id="search10" parameterType="paging" resultType="audio">
+	SELECT * FROM (SELECT ROWNUM NUM,SEARCHMUSIC .* FROM SEARCHMUSIC WHERE MUNAME LIKE '%'||#{keyword}||'%') WHERE NUM BETWEEN #{startRow} AND #{endRow} 
+	
+</select>
+
+<select id="search11" parameterType="paging" resultType="audio">
+		 SELECT * FROM (SELECT ROWNUM NUM,SEARCHSINGER .* FROM SEARCHSINGER WHERE MUSINGER LIKE '%'||#{keyword}||'%') WHERE NUM BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+</mapper>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+table, tr, td, th {
+	border: 1px solid;
+	border-collapse: collapse;
+	padding: 10px;
+	text-align: center;
+}
+</style>
+</head>
+<script th:if="${session.login eq null}">
+	alert('로그인 이후 이용해주세요');
+	location.href="index";
+</script>
+<body>
+	<div>
+		<button onclick="location.href='index'">홈페이지</button>
+	</div>
+	<div id="downListArea"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" th:inline="javascript">
+
+	var CheckLogin = [[${session.login}]]
+	
+	if(CheckLogin != null){
+		var sessionId = [[${session.login.mId}]]
+	}
+	
+	$(document).ready(function(){
+		$.ajax({
+			type : "POST",
+			url : "ajaxDownList",
+			data : {"mudMid" : sessionId},
+			dataType : "json",
+			success : function(list){
+				down(list);
+			},
+			error : function(){
+				console.log("실패");
+			}
+		});
+		
+		function down(list){
+			var output = "";
+			var downTheNumber = list.length;
+			
+			if(downTheNumber <= 0){
+				output += "<table id='downTable'>";
+				output += "<tr>";
+				output += "<th>다운로드한 음악이 없습니다.</th>";
+				output += "</tr>";
+			} else{
+				output += "<table id='downTable'>";
+				output += "<tr>";
+				output += "<th colspan = 7 style='text-align:right;'>총 다운횟수</th>";
+				output += "<th colspan = 2 name='price' value='"+downTheNumber+"' id='totalPrice'>"+downTheNumber+"번</th>";
+				output += "</tr>";
+				output += "<tr>";
+				output += "<th>프로필</th>";
+				output += "<th>제목</th>";
+				output += "<th>가수</th>";
+				output += "<th>좋아요수</th>";
+				output += "<th>조회수</th>";
+				output += "<th>구매일시</th>";
+				output += "<th>다운일시</th>";
+				output += "<th>다시받기</th>";
+				output += "<th><button class='allMusicDownload'>전체목록다운</button></th>";
+				output += "</tr>";
+			}
+			
+			for(var i in list){
+				output += "<tr>";
+				output += "<td><img src='/muImage/"+list[i].muImage+"' style='width: 200px;'></td>";
+				output += "<td><a href='muView?muCode="+list[i].muCode+"&mId="+list[i].muSinger+"'><span>"+list[i].muName+"</span></a></td>";
+				output += "<td>"+list[i].muSinger+"</td>";
+				output += "<td>"+list[i].muLike+"</td>";
+				output += "<td>"+list[i].muHit+"</td>";
+				output += "<td>"+list[i].pDate+"</td>";
+				output += "<td>"+list[i].mudDate+"</td>";
+				output += "<td colspan='2'><a href='/audio/"+list[i].mFile+"' download='"+list[i].mFile+"'><button class='selectMusicDownload' id='"+list[i].muCode+"download'>다시받기</button></a></td>";
+				output += "</tr>";
+			}
+			output += "</table>";
+			
+			var downListArea = document.getElementById('downListArea');
+			downListArea.innerHTML = output;
+			
+			$(".allMusicDownload").click(function(){
+				for(var i in list){
+					var UserName = list[i].mFile;
+					var filepath = "/audio/"+list[i].mFile;
+					download(UserName,filepath);
+				}
+				
+				function download(filename, filepath) {
+					var element = document.createElement('a');
+					element.setAttribute('href',filepath);
+					element.setAttribute('download', filename);
+					document.body.appendChild(element);
+					element.click();
+					document.body.removeChild(element);
+				}
+			});
+			
+			$(".selectMusicDownload").click(function(){
+				
+				var selectDownloadMusicCode = $(this).attr("id");
+				console.log(selectDownloadMusicCode);
+				console.log(sessionId);
+				
+				var selectMusicCode = selectDownloadMusicCode.replace("download","");
+				console.log(selectMusicCode);
+				
+				$.ajax({
+					type: "POST",
+					url: "downloadTableInsert",
+					data: {"mudMuCode": selectMusicCode,
+						   "mudMid": sessionId},
+					dataType: "json",
+					success : function(list){
+					},
+					error : function(){
+						console.log('다운로드 테이블 등록 실패');
+					}
+				});
+				
+			});
+			
+			
+			$.fn.rowspan = function(colIdx, isStats) {
+				return this.each(function(){
+					var that;
+					$('tr', this).each(function(row) {
+						$('td:eq('+colIdx+')', this).filter(':visible').each(function(col) {
+							if ($(this).html() == $(that).html()
+								&& (!isStats
+										|| isStats && $(this).prev().html() == $(that).prev().html()
+										)
+								) {
+								rowspan = $(that).attr("rowspan") || 1;
+								rowspan = Number(rowspan)+1;
+								
+								$(that).attr("rowspan",rowspan);
+								// do your action for the colspan cell here
+								$(this).hide();
+								//$(this).remove();
+								// do your action for the old cell here
+							} else {
+								that = this;
+							}
+							// set the that if not already set
+							that = (that == null) ? this : that;
+						});     
+					});    
+				});  
+			}; 
+			$('#downTable').rowspan(0);
+			$('#downTable').rowspan(1);
+			$('#downTable').rowspan(2);
+			$('#downTable').rowspan(5);
+			$('#downTable').rowspan(6);
+			$('#downTable').rowspan(7);
+			
+		}
+	});
+	
+</script>
+
+</html>

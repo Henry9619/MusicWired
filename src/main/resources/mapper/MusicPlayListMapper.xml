@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icia.musicwired.dao.MusicPlayListDao">
+    <!--playList 테이블에 insert -->
+    <insert id="playList" parameterType="MusicPlayList">
+        INSERT INTO PLAYLIST
+        VALUES (PLAY_SEQ.NEXTVAL, #{plmuCode}, #{plMid})
+    </insert>
+
+    <!--리스트 내용 출력-->
+    <select id="playListPrint" parameterType="String" resultType="audio">
+        SELECT DISTINCT A.MUSINGER, A.MUNAME, A.MUIMAGE, A.MFILE, A.MUGANRE, A.MUHIT, A.MUDATE, A.MULIKE, A.MUCODE
+        FROM MUSIC A,
+             PLAYLIST
+        WHERE  MUCODE=PLMUCODE AND PLMID = #{plMid} ORDER BY MUCODE
+    </select>
+
+    <!--리스트 내용 검색-->
+    <select id="playListSearch" parameterType="String" resultType="audio">
+        SELECT * FROM MUSIC WHERE MUNAME LIKE '%'||#{muName}||'%' ORDER BY MUCODE DESC
+    </select>
+
+    <select id="playListDeleteAjax" parameterType="String" resultType="MusicPlayList">
+        SELECT DISTINCT p.PLMUCODE, p.PLMID
+        FROM MUSIC,
+             PLAYLIST p
+        WHERE  MUCODE=PLMUCODE AND PLMID = #{plMid} ORDER BY PLMUCODE
+    </select>
+
+    <!--리스트 목록 삭제-->
+    <delete id="PlayListDelete" parameterType="MusicPlayList">
+        DELETE FROM PLAYLIST WHERE PLMID = #{mId} AND PLMUCODE =#{plmuCode}
+    </delete>
+
+    <select id="ajaxplayList" parameterType="String" resultType="MusicPlayList">
+        SELECT A.MUSINGER, A.MUNAME, A.MUIMAGE, A.MFILE
+        FROM MUSIC A,
+             PLAYLIST
+        WHERE  MUCODE=PLMUCODE AND PLMID = #{plMid}
+    </select>
+</mapper>

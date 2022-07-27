@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="No-Cache">
+
+<meta http-equiv="Pragma" content="No-Cache">
+<title>Insert title here</title>
+<style>
+table, tr, td, th {
+	border: 1px solid;
+	border-collapse: collapse;
+	padding: 10px;
+	text-align: center;
+}
+body{
+ -ms-overflow-style: none;
+ }
+ 
+::-webkit-scrollbar {
+  display: none;
+}
+
+/*특정 부분 스크롤바 없애기*/
+
+.box{
+   -ms-overflow-style: none;
+}
+.box::-webkit-scrollbar{
+  display:none;
+}
+
+
+</style>
+
+
+</head>
+<script th:if="${session.login eq null}">
+	alert('로그인 이후 이용해주세요');
+	location.href="memberLogin";
+</script>
+<body>
+
+	<div>
+		<button onclick="location.href='index'">홈페이지</button>
+	</div>
+<form>
+<table>
+    <tr>
+        <th></th>
+        <th>가수 이름</th>
+        <th>음악 이름</th>
+        <th>음악 장르</th>
+        <th>게시일</th>
+        <th>조회 수</th>
+        <th>가격</th>
+
+        <th colspan="2">장바구니</th>
+
+
+    </tr>
+    
+    <tr th:each="list : ${upList}">
+        <th><input type="radio" th:value="HI" th:id="radioCheck"></th>
+        <td th:text="${list.muSinger}"></td>
+        <td><a th:href="@{muView(muCode=${list.muCode},mId=${session.login.mId})}" th:text="${list.muName}" id="audio"></a></td>
+        <td th:text="${list.muGanre}"></td>
+        <td th:text="${list.muDate}"></td>
+        <td th:text="${list.muHit}"></td>
+        <td th:text="500"></td>
+        <!-- <td th:id="check+${list.muCode}"><span style="background-color: gray; color: white;" th:id="${list.muCode}" th:class="cartChange" th:value="check1">장바구니 추가1</span></td> -->
+
+        <td style="background-color: gray; color: white;" th:id="${list.muCode}" th:class="cartChange" th:value="check1">장바구니 추가</td>     
+        <!-- <td style="background-color: red; color: white;" th:id="${list.muCode}" th:class="cartChange" th:value="check2">추가완료</td> -->
+        <td th:text="${list.muPrice}"></td>
+        <td><button th:id="${list.muCode}" th:class="cartAdd">장바구니 추가</button></td>
+<!--        <td><button th:id="${list.muCode}" th:class="PlayListAdd">플레이리스트 추가</button></td>-->
+
+
+    </tr>
+
+</table>
+    <button type="submit" th:id="PlayListAddBtn">플레이 리스트 추가</button> </br>
+<code th:if="${paging.page <= 1}" th:text="이전"></code>
+
+<code th:if="${paging.page > 1}">
+    <a th:href="@{fileList(page=${paging.page-1},limit=${paging.limit},mId=${session.login.mId})}" th:text="이전"></a>
+</code>
+
+
+<th:block th:each="i : ${#numbers.sequence(paging.startPage , paging.endPage)}">
+    <code  th:if= "${paging.page eq i}" th:text="${i}"></code>
+    <a th:unless="${paging.page eq i}" th:href="@{fileList(page=${i},limit=${paging.limit},mId=${session.login.mId})}" ><code th:text="${i}"></code></a>
+</th:block>
+<code th:if="${paging.page >= paging.maxPage}" th:text="다음"></code>
+<code th:if="${paging.page < paging.maxPage}">
+    <a th:href="@{fileList(page=${paging.page+1},limit=${paging.limit},mId=${session.login.mId})}" th:text="다음"></a>
+</code>
+</form>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" th:inline="javascript">
+
+
+	console.log('sessionId = ' + sessionId);
+	
+	$(".cartChange").click(function(){
+		
+		var muCode = $(this).attr('id');
+		console.log("muCode : "+muCode);
+		
+		var cartCheck = $(this).attr('value');
+		
+		var checktest = "check" + muCode;
+		
+		console.log("checktest : " + checktest);
+		
+		if(cartCheck == "check1"){
+			$.ajax({
+				type : "POST",
+				url : "cartListAdd",
+				data : {"caMuCode" : muCode,
+						"caMid" : sessionId
+						},
+				dataType : "json",
+				success : function(list){
+
+					CartAddSuccess(list);
+				},
+				error : function(){
+					alert('장바구니 추가 실패');
+				}
+			});
+			
+			function CartAddSuccess(list){
+				
+				var output = "";
+				
+				output += "<td style='background-color: red; color: white;' th:id='"+list.muCode+"'>추가완료</td>";
+				
+				var td22 = document.getElementById(muCode);
+				console.log(td22);
+				td22.innerHTML = output;
+			}
+			$(this).css('background-color','red');
+			cartCheck = $(this).attr('value','check2');
+			
+		}else if(cartCheck == "check2"){
+			$.ajax({
+				type : "POST",
+				url : "cartListDelete",
+				data : {"caMuCode" : muCode,
+						"caMid" : sessionId
+						},
+				dataType : "json",
+				success : function(list){
+					CartDeleteSuccess(list);
+				},
+				error : function(){
+					alert('장바구니 삭제 실패');
+				}
+			});
+			
+			function CartDeleteSuccess(list){
+				
+				var output = "";
+				
+				output += "<td style='background-color: red; color: white;' th:id='"+list.muCode+"'>장바구니 추가</td>";
+				
+				var td22 = document.getElementById(muCode);
+				console.log(td22);
+				td22.innerHTML = output;
+			}
+			
+			$(this).css('background-color','gray');
+			cartCheck = $(this).attr('value','check1');
+			
+		}
+	});
+
+    $("#PlayListAddBtn").click(function (){
+        var radioCheck = $("#radioCheck").val();
+        console.log(radioCheck);
+    });
+
+</script>
+</html>

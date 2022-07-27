@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.DownDAO">
+
+<!-- 다운로드 테이블 등록 메소드 -->
+	<insert id="downloadTableInsert" parameterType="Down">
+		INSERT INTO MUDOWN VALUES(#{mudMid},#{mudMuCode},SYSDATE)
+	</insert>
+	
+<!-- 다운로드 목록 출력 메소드 -->
+	<select id="ajaxDownList" parameterType="String" resultType="audio">
+		SELECT DISTINCT M.MUCODE, M.MUSINGER, M.MUNAME, M.MUGANRE, M.MUDATE, M.MUIMAGE, M.MUHIT, M.MUPRICE, M.MFILE, M.MULIKE, P.PDATE, TO_CHAR(D.MUDDATE,'YYYY-MM-DD') AS MUDDATE
+		FROM MUDOWN D, MUSIC M, PAY P
+		WHERE M.MUCODE = D.MUDMUCODE AND P.PMUCODE = M.MUCODE AND D.MUDMID = P.PSMID AND MUDMID = #{mudMid} ORDER BY MUDDATE DESC
+ 
+	</select>
+	
+</mapper>

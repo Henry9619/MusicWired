@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.ChartDAO">
+<select id="hitChart" resultType="audio">
+	  	SELECT * FROM  (SELECT *FROM MUSIC ORDER BY MUHIT DESC)WHERE ROWNUM <![CDATA[ < ]]>=30
+</select>
+
+<select id="likeChart" resultType="audio">
+ 	SELECT * FROM  (SELECT *FROM MUSIC ORDER BY MULIKE DESC)WHERE ROWNUM <![CDATA[ < ]]>=30
+</select>
+
+<select id="balgenre" resultType="audio">
+	SELECT * FROM BAL WHERE RN BETWEEN #{startRow} AND #{endRow}  
+</select>
+
+    <select id="baladCount" resultType="int">
+		SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='발라드'
+	</select>
+
+<select id="danceGenre" resultType="audio">
+	SELECT * FROM DANCE WHERE RN BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+<select id="danceCount" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='댄스'
+</select>
+
+<select id="rockGenre" resultType="audio">
+	SELECT * FROM ROCK WHERE RN BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+<select id="rockCount" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='록'
+</select>
+
+<select id="hiphopGenre" resultType="audio">
+	SELECT * FROM HIPHOP WHERE RN BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+<select id="hiphopCount" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='힙합'
+</select>
+
+<select id="indiGenre" resultType="audio">
+	SELECT * FROM INDI WHERE RN BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+<select id="indiCount" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='인디'
+</select>
+
+<select id="gitaGenre" resultType="audio">
+	SELECT * FROM METC WHERE RN BETWEEN #{startRow} AND #{endRow} 
+</select>
+
+<select id="gitaCount" resultType="int">
+	SELECT COUNT(*) FROM MUSIC WHERE MUGANRE='그 외 장르'
+</select>
+
+
+</mapper>

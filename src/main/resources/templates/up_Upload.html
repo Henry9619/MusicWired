@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/select2.min.css">
+    <link rel="stylesheet" href="css/paymentfont.min.css">
+    <link rel="stylesheet" href="css/slider-radio.css">
+    <link rel="stylesheet" href="css/plyr.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="icon/favicon-32x32.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="icon/favicon-32x32.png">
+
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="Dmitry Volkov">
+    <title>UpLoad Page</title>
+
+</head>
+<script th:if="${session.login eq null}">
+
+    alert('로그인 이후 이용해주세요.');
+
+  location.href = "/index";
+  
+</script>
+<style>
+    #SinggerDiv{
+        margin-bottom: 20px;
+        color: wheat;
+        padding: 10px;
+    }
+    #SinggerSpan{
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+    }
+</style>
+<style type="text/css">
+    .sign__group #fileName1 #fileName2{
+        display: inline-block;
+        height: 40px;
+        padding: 0 10px;
+        vertical-align: middle;
+        border: 1px solid #dddddd;
+        width: 78%;
+        color: #999999;
+    }
+
+    .MusicImge{
+        color: white;
+    }
+
+
+
+    .sign__group label{
+        display: inline-block;
+        padding: 10px 20px;
+        color: #fff;
+        vertical-align: middle;
+        background-color: #999999;
+        cursor: pointer;
+        height: 40px;
+    }
+
+    .sign__group input[type="file"] {
+        position: absolute;
+        width: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 0;
+    }
+
+    .sign__group label:hover {
+        color: #fff;
+        background-color: #222227;
+        cursor: pointer;
+    }
+
+    /*.sign__group label{*/
+    /*       padding: 6px 25px;*/
+    /*    background-color: #25a56a;*/
+    /*       border-radius: 4px;*/
+    /*       color: white;*/
+    /*       cursor: pointer;*/
+    /*}*/
+</style>
+<body>
+<!-- header -->
+<header th:replace="header.html :: header"></header>
+
+<!-- end header -->
+
+<!-- sidebar -->
+<aside th:replace="sidebar.html :: aside"></aside>
+
+<!-- end sidebar -->
+
+<!-- player -->
+<div class="player">
+    <div class="player__cover">
+        <img src="img/covers/cover.svg" alt="">
+    </div>
+
+    <div class="player__content">
+        <span class="player__track"><b class="player__title">Epic Cinematic</b> – <span class="player__artist">AudioPizza</span></span>
+        <audio src="https://dmitryvolkov.me/demo/blast2.0/audio/12071151_epic-cinematic-trailer_by_audiopizza_preview.mp3" id="audio" controls></audio>
+    </div>
+</div>
+
+<button class="player__btn" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z"/></svg> Player</button>
+<!-- end player -->
+
+<!-- main content -->
+<main class="main">
+    <div class="container-fluid">
+        <div class="row row--grid">
+            <!-- breadcrumb -->
+            <div class="col-12">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb__item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb__item breadcrumb__item--active">Sign up</li>
+                </ul>
+            </div>
+            <!-- end breadcrumb -->
+
+            <!-- registration form -->
+            <div class="col-12">
+                <div class="sign">
+                    <div class="sign__content">
+                        <form ACTION="fileUpload" METHOD="POST" ENCTYPE="multipart/form-data" class="sign__form">
+                            <a href="index.html" class="sign__logo">
+                                <img src="img/MUSICWIREDLOGO1.png" alt="">
+                            </a>
+
+                            <div id="SinggerDiv">
+                                가수 : <span id="SinggerSpan" th:if='${session.login ne null}' th:text="${session.login.mId}" class="sign__input"></span>
+                            </div>
+
+                            <div class="sign__group">
+                                <input type="text" class="sign__input" placeholder="음악 이름" name="muName">
+                            </div>
+
+                            <div class="sign__group">
+                                <input type="text" class="sign__input" placeholder="가사" name="muLyrics">
+                            </div>
+
+                            <div class="sign__group">
+                                <select class="sign__input"  name="muGanre">
+                                    <option value="선택">장르 선택</option>
+                                    <option value="발라드">발라드</option>
+                                    <option value="댄스">댄스</option>
+                                    <option value="록">록</option>
+                                    <option value="힙합">힙합</option>
+                                    <option value="인디">인디</option>
+                                    <option value="그 외 장르">그 외 장르</option>
+                                </select>
+                            </div>
+
+                            <div class="sign__group">
+                                <input id="MusicFileFor" type="file" class="sign__input" name="muFile">
+<!--                                <input class="upload-name" type="text" value="첨부파일" readonly style="margin-right: 20px">-->
+                                <span id="fileName1" style="margin-right: 50%" class="MusicImge">선택된 파일없음</span>
+                                <label for="MusicFileFor" style="border-radius: 10px">음악파일</label>
+                            </div>
+
+                            <div class="sign__group">
+                                <input id="MusicImage" type="file" class="sign__input" name="mImage">
+<!--                                <input class="upload-name1" type="text" value="첨부파일" readonly style="margin-right: 20px">-->
+                                <span id="fileName2" style="margin-right: 50%" class="MusicImge">선택된 파일없음</span>
+                                <label for="MusicImage" style="border-radius: 10px">음악 이미지</label>
+                            </div>
+
+                            <input th:if='${session.login ne null}' type="hidden" name="muSinger" th:value="${session.login.mId}">
+
+
+                            <input class="sign__btn" type="submit" value="Upload"></button>
+
+                            <input class="sign__btn" type="reset" value="Reset"></button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end registration form -->
+        </div>
+    </div>
+</main>
+<!-- end main content -->
+
+
+<!-- footer -->
+<footer th:replace="footer.html :: footer"></footer>
+<!-- end footer -->
+
+
+<!-- modal info -->
+<div id="modal-info2" class="zoom-anim-dialog mfp-hide modal modal--info">
+		<span class="modal__icon modal__icon--green">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.72,8.79l-4.29,4.3L8.78,11.44a1,1,0,1,0-1.41,1.41l2.35,2.36a1,1,0,0,0,.71.29,1,1,0,0,0,.7-.29l5-5a1,1,0,0,0,0-1.42A1,1,0,0,0,14.72,8.79ZM12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"></path></svg>
+		</span>
+
+    <button class="modal__close" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+
+    <h4 class="sign__title">Payment #51 was successful!</h4>
+
+    <div class="sign__group sign__group--row">
+        <label class="sign__label">Total cost:</label>
+        <span class="sign__value">$18.00</span>
+    </div>
+
+    <div class="sign__group sign__group--row">
+        <label class="sign__label">Payment method: <b>Paypal</b></label>
+
+        <span class="sign__text sign__text--small">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</span>
+    </div>
+</div>
+<!-- end modal info -->
+
+<!-- modal info -->
+<div id="modal-info3" class="zoom-anim-dialog mfp-hide modal modal--info">
+		<span class="modal__icon modal__icon--red">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.71,8.29a1,1,0,0,0-1.42,0L12,10.59,9.71,8.29A1,1,0,0,0,8.29,9.71L10.59,12l-2.3,2.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l2.29,2.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42L13.41,12l2.3-2.29A1,1,0,0,0,15.71,8.29Zm3.36-3.36A10,10,0,1,0,4.93,19.07,10,10,0,1,0,19.07,4.93ZM17.66,17.66A8,8,0,1,1,20,12,7.95,7.95,0,0,1,17.66,17.66Z"></path></svg>
+		</span>
+
+    <button class="modal__close" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+
+    <h4 class="sign__title">Payment #50 failed!</h4>
+
+    <div class="sign__group sign__group--row">
+        <label class="sign__label">Total cost:</label>
+        <span class="sign__value">$18.00</span>
+    </div>
+
+    <div class="sign__group sign__group--row">
+        <label class="sign__label">Payment method: <b>Paypal</b></label>
+
+        <span class="sign__text sign__text--small">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</span>
+    </div>
+</div>
+<!-- end modal info -->
+
+<!-- modal info -->
+<div id="modal-info4" class="zoom-anim-dialog mfp-hide modal modal--info">
+		<span class="modal__icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,2A10,10,0,1,0,22,12,10.01114,10.01114,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8.00917,8.00917,0,0,1,12,20Zm0-8.5a1,1,0,0,0-1,1v3a1,1,0,0,0,2,0v-3A1,1,0,0,0,12,11.5Zm0-4a1.25,1.25,0,1,0,1.25,1.25A1.25,1.25,0,0,0,12,7.5Z"></path></svg>
+		</span>
+
+    <button class="modal__close" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+
+    <h4 class="sign__title">Example of notification.</h4>
+
+    <div class="sign__group sign__group--row">
+        <label class="sign__label">Amount to auto-renew:</label>
+        <span class="sign__value">$18.00</span>
+    </div>
+
+    <div class="sign__group sign__group--row">
+        <span class="sign__text sign__text--small">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</span>
+    </div>
+</div>
+<!-- end modal info -->
+
+<!-- modal info -->
+<div id="modal-info5" class="zoom-anim-dialog mfp-hide modal modal--info">
+		<span class="modal__icon modal__icon--purple">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18,7h-.35A3.45,3.45,0,0,0,18,5.5a3.49,3.49,0,0,0-6-2.44A3.49,3.49,0,0,0,6,5.5,3.45,3.45,0,0,0,6.35,7H6a3,3,0,0,0-3,3v2a1,1,0,0,0,1,1H5v6a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V13h1a1,1,0,0,0,1-1V10A3,3,0,0,0,18,7ZM11,20H8a1,1,0,0,1-1-1V13h4Zm0-9H5V10A1,1,0,0,1,6,9h5Zm0-4H9.5A1.5,1.5,0,1,1,11,5.5Zm2-1.5A1.5,1.5,0,1,1,14.5,7H13ZM17,19a1,1,0,0,1-1,1H13V13h4Zm2-8H13V9h5a1,1,0,0,1,1,1Z"></path></svg>
+		</span>
+
+    <button class="modal__close" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+
+    <h4 class="sign__title">You have received a gift!</h4>
+
+    <div class="sign__group sign__group--row">
+        <span class="sign__text sign__text--small">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</span>
+
+        <span class="sign__text sign__text--small">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</span>
+    </div>
+</div>
+<!-- end modal info -->
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+<script th:inline="javascript">
+
+    document.getElementById('MusicFileFor').addEventListener('change', function(){
+        var fileName = document.getElementById('fileName1');
+        if(this.files[0] == undefined){
+            fileName.innerText = '선택된 파일없음';
+            return;
+        }
+        fileName.innerText = this.files[0].name;
+    });
+
+    document.getElementById('MusicImage').addEventListener('change', function(){
+        var fileName = document.getElementById('fileName2');
+        if(this.files[0] == undefined){
+            fileName.innerText = '선택된 파일없음';
+            return;
+        }
+        fileName.innerText = this.files[0].name;
+    });
+
+
+
+        // MusicFileFor
+    // $("#MusicFileFor").on('change',function (){
+    //    var fileName = $("#MusicFileFor")
+    //     $(".upload-name").val(fileName);
+    // });
+
+    // //MusicImage
+    // $("#MusicImage").on('change',function (){
+    //     var fileName = $("#MusicImage")
+    //     $(".upload-name1").val(fileName);
+    // });
+</script>
+<!-- JS -->
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/jquery.magnific-popup.min.js"></script>
+<script src="js/smooth-scrollbar.js"></script>
+<script src="js/select2.min.js"></script>
+<script src="js/slider-radio.js"></script>
+<script src="js/jquery.inputmask.min.js"></script>
+<script src="js/plyr.min.js"></script>
+<script src="js/main.js"></script>
+</html>

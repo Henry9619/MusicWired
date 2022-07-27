@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+<link rel="stylesheet" href="css/owl.carousel.min.css">
+<link rel="stylesheet" href="css/magnific-popup.css">
+<link rel="stylesheet" href="css/select2.min.css">
+<link rel="stylesheet" href="css/paymentfont.min.css">
+<link rel="stylesheet" href="css/slider-radio.css">
+<link rel="stylesheet" href="css/plyr.css">
+<link rel="stylesheet" href="css/main.css">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" href="icon/favicon-32x32.png"
+	sizes="32x32">
+<link rel="apple-touch-icon" href="icon/favicon-32x32.png">
+<style>
+.toast-wrap {
+	display: table;
+	position: fixed;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-o-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	padding: 10px;
+	border-radius: 5%;
+	z-index: 999;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+.container {
+	width: 600px;
+	margin: 0 auto;
+	padding: 25px;
+}
+
+.container h3 {
+	text-align: left;
+	padding: 5px 5px 5px 15px;
+	color: #0099FF;
+	border-left: 3px solid #0099FF;
+	margin-bottom: 10px;
+}
+
+.chating {
+	background-color: #222222;
+	width: 100%;
+	height: 550px;
+	overflow: auto;
+	font-size: 20px;
+}
+
+.chating p {
+	color: #fff;
+	text-align: left;
+}
+
+input {
+	width: 330px;
+	height: 25px;
+}
+
+.chating .me {
+	display: block;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 400;
+	font-family: 'Inter', sans-serif;
+	color: black;
+	text-align: right;
+	padding-right: 20px;
+	 background-color: yellow;
+    float:right;
+    padding:0.5rem;
+    border-radius:1rem;
+    clear:both;
+    font-weight:bold;
+    color : black;
+    font-size:1.06rem;
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+.chating .others {
+	display: block;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 400;
+	font-family: 'Inter', sans-serif;
+	color: black;
+	text-align: right;
+	padding-right: 20px;
+	 background-color:white;
+    float:left;
+    padding:0.5rem;
+    border-radius:1rem;
+    clear:both;
+    font-weight:bold;
+    color : black;
+    font-size:1.06rem;
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+
+
+ .date1{
+font-size: 15px;
+	float:left;
+	align-self: flex-end;
+	 text-align: center;
+	     flex-basis: 3.75rem;
+    flex-shrink: 0;
+    margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
+    font-size: 0.75rem;
+    margin-top: 20px;
+}
+
+ .date{
+font-size: 15px;
+	float:right;
+	align-self: flex-end;
+	 text-align: center;
+	     flex-basis: 3.75rem;
+    flex-shrink: 0;
+    margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
+    font-size: 0.75rem;
+    margin-top: 20px;
+}
+
+#chating{
+	overflow: auto;
+}
+#chating::-webkit-scrollbar{
+	width: 4px;
+}
+#chating::-webkit-scrollbar-track {
+  	background: #222227;
+}
+#chating::-webkit-scrollbar-thumb {
+  	background-color: #0099FF;
+  	outline: 1px solid #222227;
+  	border-radius: 10px;
+}
+
+.sign__btn1 {
+  width: 60px;
+  height: 50px;
+  border-radius: 12px;
+  background-color: #0099FF;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 14px;
+  position: relative;
+  z-index: 2;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  margin: 15px auto;
+}
+</style>
+</head>
+<header th:replace="header.html :: header"></header>
+<aside th:replace="sidebar.html :: aside"></aside>
+<script type="text/javascript">
+	var ws;
+	$(document).ready(function() {
+
+		wsOpen();
+	
+		/* if($("#loginId").val() != "admin"){
+			$.ajax({
+				type : "POST",
+				url : "delMessage",
+				data : { "crId" : sessionId},
+				dataType : "json",
+				success : function(list){
+					
+				},
+				error : function(){
+					alert('fail');
+				}
+			});
+		} */
+
+		if($("#loginId").val() == "admin") {
+		
+			$.ajax({
+
+				type : "POST",
+				url : "readupdate",
+				data : {
+					"crNum" : $("#roomNumber").val()
+				},
+				dataType : "json",
+				success : function() {
+
+				},
+				error : function() {
+
+				}
+
+			});
+		} 
+		
+	});
+
+	function wsOpen() {
+
+		//웹소켓 전송시 현재 방의 번호를 넘겨서 보낸다.
+
+		ws = new WebSocket("ws://" + location.host + "/chating/"
+				+ $("#roomNumber").val());
+
+		wsEvt();
+
+		document.getElementById('chating').scrollTop = document
+				.getElementById('chating').scrollHeight;
+
+	}
+
+
+	
+
+	function wsEvt() {
+		ws.onopen = function(data) {
+			//소켓이 열리면 동작
+		}
+
+		ws.onmessage = function(data) {
+
+			//메시지를 받으면 동작
+			var msg = data.data;
+			if (msg != null && msg.trim() != '') {
+
+			}
+			;
+			var d = JSON.parse(msg);
+			/* if(d.type == "getId"){
+				var si = d.sessionId != null ? d.sessionId : "";
+				if(si != ''){
+					$("#sessionId").val(si);
+				}
+			}else */
+		
+			if (d.type == "message") {
+				if (d.userName == $("#loginId").val()) {
+					$("#chating").append(
+							"<p class='me'>" + $("#loginId").val() + ": "
+									+ d.msg + "<p id='csDate' class='date'>"
+									+ d.date + "</p></p>");
+
+				}
+				if (d.userName !== $("#loginId").val()) {
+					$("#chating").append(
+							"<p class='others'>" + d.userName + ": " + d.msg
+									+ "<p id='csDate1' class='date1'>"
+									+ d.date + "</p></p>");
+				}
+
+				if ($("#loginId").val() == "admin") {
+					if (d.userName !== "admin") {
+						setTimeout(function() {
+							notify(d.userName, d.msg);
+						}, 300);
+					}
+				}
+
+				/* if($("#loginId").val() !== "admin"){
+					if(d.userName == "admin"){
+					setTimeout(function () {
+				         notify(d.userName,d.msg);
+				     }, 300);
+				}
+				}
+				 */
+
+			} else {
+				console.warn("unknown type!")
+			}
+			document.getElementById('chating').scrollTop = document
+					.getElementById('chating').scrollHeight;
+
+		}
+
+	}
+
+	document.addEventListener("keypress", function(e) {
+		if (e.keyCode == 13) { //enter press
+			send();
+		}
+	});
+
+	function send() {
+		var option = {
+			type : "message",
+			roomNumber : $("#roomNumber").val(),
+			sessionId : $("#sessionId").val(),
+			userName : $("#loginId").val(),
+			msg : $("#chatting").val(),
+			date : new Date(+new Date() + 3240 * 10000).toISOString().replace(
+					"T", " ").replace(/\..*/, '').substring(0, 16)
+
+		}
+
+		ws.send(JSON.stringify(option));
+
+		$.ajax({
+
+			type : "POST",
+			url : "/chatSave",
+			data : {
+				"csNum" : $("#roomNumber").val(),
+				"csId" : $("#loginId").val(),
+				"csContent" : $("#chatting").val()
+			},
+			dataType : "json",
+			success : function() {
+
+			},
+			error : function() {
+
+			}
+
+		});
+		
+		if($("#loginId").val()=="admin"){
+				 $.ajax({
+
+				type : "POST",
+				url : "/newMessageUp",
+				data : {
+					"csNum" : $("#roomNumber").val()
+				},
+				dataType : "json",
+				success : function() {
+
+				},
+				error : function() {
+
+				}
+
+			});
+		}
+
+		$('#chatting').val("");
+
+	}
+	
+	
+	window.onload = function() {
+		if (window.Notification) {
+			Notification.requestPermission();
+		}
+	}
+
+	function notify(name, msg) {
+		var name1 = name;
+		var msg1 = msg;
+		if (Notification.permission !== 'granted') {
+			alert('notification is disabled');
+		} else {
+			var notification = new Notification(name1 + '님이 메세지를 보냈습니다', {
+				icon : 'http://192.168.1.100/static/chat/chaticon.png',
+				body : msg1,
+			});
+
+			notification.onclick = function() {
+				window.open('http://google.com');
+			};
+		}
+	}
+	
+	
+	if($("#loginId").val() == "admin") {
+		console.log("1");
+		$.ajax({
+
+			type : "POST",
+			url : "readupdate",
+			data : {
+				"crNum" : $("#roomNumber").val()
+			},
+			dataType : "json",
+			success : function() {
+
+			},
+			error : function() {
+
+			}
+
+		});
+	} else{
+		
+		console.log("2");
+			$.ajax({
+				type : "POST",
+				url : "delMessage",
+				data : { "crId" : sessionId},
+				dataType : "json",
+				success : function(list){
+					
+				},
+				error : function(){
+					alert('fail');
+				}
+			});
+			
+		
+		
+		
+	} 
+</script>
+
+<body>
+
+	<div id="container" class="container">
+		<h3 th:text="${crdto.crId} +님+' '+채팅방"></h3>
+
+		<input th:type="hidden" th:id="roomNumber" th:value="${crdto.crNum}">
+		<!-- 	<input type="hidden" id="sessionId" value=""> -->
+
+		<div id="chating" class="chating">
+		
+			<div th:each='csdto:${csdto}' >
+		
+				<p th:if="${csdto.csId eq session.login.mId}" class='me'
+					th:text="${csdto.csId}+': '+${csdto.csContent}+''"></p>
+				<p id="csDate" th:if="${csdto.csId eq session.login.mId}" class="date"
+					th:text="${#dates.format(csdto.csDate, 'MM-dd a HH:mm')}"></p>
+
+
+			
+				<p th:if="${csdto.csId ne session.login.mId}" class='others'
+					th:text="${csdto.csId}+': '+${csdto.csContent}"></p>
+				<p id="csDate1" th:if="${csdto.csId ne session.login.mId}"
+					class='date1'
+					th:text="${#dates.format(csdto.csDate, 'MM-dd a HH:mm')}"></p>
+
+			</div>
+
+		</div>
+
+		<div id="yourMsg">
+			<table class="inputTable">
+				<tr>
+
+					
+					<th><input type="text" id="chatting" class="sign__textarea"
+						placeholder="보내실 메시지를 입력하세요."></th>
+					<th><button type="button" class="sign__btn1" onclick="send()"
+							id="sendBtn">전송</button></th>
+					<th><input th:type="hidden" th:value="${session.login.mId}"
+						th:id="loginId" />
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="toast" class="toast-wrap" th:fragment="toast1"></div></body>
+	<footer th:replace="footer.html :: footer"></footer>
+	<!-- JS -->
+	<script src="js/jquery-3.5.1.min.js"></script>
+	<script src="js/bootstrap.bundle.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/smooth-scrollbar.js"></script>
+	<script src="js/select2.min.js"></script>
+	<script src="js/slider-radio.js"></script>
+	<script src="js/jquery.inputmask.min.js"></script>
+	<script src="js/plyr.min.js"></script>
+	<script src="js/main.js"></script>
+</html>
+

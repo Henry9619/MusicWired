@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<head>	
+
+<link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	<link rel="stylesheet" href="css/select2.min.css">
+	<link rel="stylesheet" href="css/paymentfont.min.css">
+	<link rel="stylesheet" href="css/slider-radio.css">
+	<link rel="stylesheet" href="css/plyr.css">
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="icon" type="image/png" href="icon/favicon-32x32.png" sizes="32x32">
+	<link rel="apple-touch-icon" href="icon/favicon-32x32.png">
+
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta name="author" content="Dmitry Volkov">
+
+
+</head>
+<body>
+  
+    
+ <header th:replace="header.html :: header"></header>
+<aside th:replace="sidebar.html :: aside"></aside>
+
+<div class="main">
+
+<div class="row row--grid">
+		<div class="col-12">
+			<div class="dashbox">
+				<div class="dashbox__table-wrap">
+					<div class="dashbox__table-scroll">
+
+<table class="main__table">
+		<caption th:text="'음악 이름검색 총('+${nCount}+')개'"></caption>
+		<tr>
+			<th class="main__table-text">no</th>
+			<th class="main__table-text">음악이름</th>
+			<th class="main__table-text">가수</th>
+			<th class="main__table-text">장르</th>
+			<th class="main__table-text">날짜</th>
+		</tr>
+		<!-- 
+		<c:forEach var="data" items="idto">
+		
+		</c:forEach> -->
+		<tr th:each="search, i : ${search}">
+			 <td class="main__table-text main__table-text--number" th:text="${i.index+1}"></td>
+			<td class="main__table-text"><a th:href="@{muView(muCode=${search.muCode})}" th:text="${search.muName}"></a></td>
+			<td class="main__table-text" th:text="${search.muSinger}"></td>
+			<td class="main__table-text" th:text="${search.muGanre}"></td>
+			<td class="main__table-text main__table-text--green" th:text="${search.muDate}"></td>
+		</tr>
+</table>
+					
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+<div class="main__table-text main__table-text--green">
+	<code th:if="${paging.page <= 1}" th:text="이전"></code>
+	<code th:if="${paging.page > 1}">
+    <a th:href="@{songSearch(page=${paging.page-1},limit=${paging.limit},keyword=${paging.mId})}" th:text="이전"></a>
+	</code>
+
+	<th:block th:each="i : ${#numbers.sequence(paging.startPage , paging.endPage)}">
+    <code  th:if= "${paging.page eq i}" th:text="${i}"></code>
+    <a th:unless="${paging.page eq i}" th:href="@{songSearch(page=${i},limit=${paging.limit},keyword=${paging.mId})}" ><code th:text="${i}"></code></a>
+	</th:block>
+	<code th:if="${paging.page >= paging.maxPage}" th:text="다음"></code>
+	<code th:if="${paging.page < paging.maxPage}">
+    <a th:href="@{songSearch(page=${paging.page+1},limit=${paging.limit},keyword=${paging.mId})}" th:text="다음"></a>
+	</code>
+  </div>
+</div>
+
+</body>
+</html>

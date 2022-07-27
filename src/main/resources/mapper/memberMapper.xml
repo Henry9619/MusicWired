@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.MemberDAO">
+
+	<insert id="memberJoin" parameterType="member">
+
+		INSERT INTO MEMBER
+		VALUES(#{mId}, #{mPw}, #{mName}, #{mGender}, #{mEmail}, 0, 0,
+		#{mProfileName, jdbcType=VARCHAR},0)
+
+	</insert>
+
+	<select id="checkId" parameterType="String" resultType="String">
+		SELECT
+		MID FROM MEMBER WHERE MID=#{mId}
+	</select>
+
+	<select id="checkEmail" parameterType="String"
+		resultType="String">
+		SELECT MEMAIL FROM MEMBER WHERE MEMAIL =#{mEmail}
+	</select>
+
+	<select id="memLogin" parameterType="member" resultType="member">
+		SELECT *
+		FROM MEMBER WHERE MID=#{mId} AND MPW=#{mPw}
+	</select>
+
+	<select id="mEpw" parameterType="String" resultType="String">
+		SELECT MPW
+		FROM MEMBER WHERE MID = #{mId}
+	</select>
+
+	<select id="memberView" parameterType="String"
+		resultType="member">
+		SELECT * FROM MEMBER WHERE MID = #{mId}
+	</select>
+
+	<update id="memberModify" parameterType="member">
+		UPDATE MEMBER SET
+		MPW=#{mPw}, MNAME=#{mName}, MEMAIL=#{mEmail},
+		MPROFILENAME=#{mProfileName, jdbcType=VARCHAR} WHERE MID=#{mId}
+
+	</update>
+
+	<delete id="memberDelete" parameterType="String">
+		DELETE FROM MEMBER WHERE
+		MID=#{mId}
+	</delete>
+
+	<select id="memberList" resultType="member">
+		SELECT * FROM MEMBER ORDER BY
+		MNAME
+	</select>
+
+	<select id="memIdfind" parameterType="String"
+		resultType="String">
+		SELECT MID FROM MEMBER WHERE MEMAIL = #{mEmail}
+	</select>
+<!-- 비번찾기(입력한 아이디가 가입되어 있는지 확인하는 메소드) -->
+	<select id="memPwfindSelect" parameterType="member" resultType="member">
+		SELECT * FROM MEMBER WHERE MID = #{mId}
+	</select>
+	
+<!-- 비번찾기(임시 비밀번호로 비번 지정) -->
+	<update id="memPwfindUpdate" parameterType="member">
+		UPDATE MEMBER SET MPW = #{mPw} WHERE MID = #{mId}
+	</update>
+
+	<select id="boardWriterView" parameterType="String"
+		resultType="member">
+		SELECT * FROM MEMBER WHERE MID = #{boWriter}
+	</select>
+	
+<select id="ajaxIdSearch" parameterType="String" resultType="member">
+		SELECT * FROM MEMBER WHERE MID LIKE '%' ||#{mId}||'%'
+	</select>
+
+</mapper>

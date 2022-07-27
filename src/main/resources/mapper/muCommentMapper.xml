@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.MusicCommentDAO">
+
+	<select id="mcList" parameterType="int" resultType="mucomment">
+		SELECT M.MPROFILENAME, C.MCDATE, C.MCCONTENT, C.MCMID, C.MCMUNUM, C.MCCODE
+		FROM MEMBER M,
+			 MUCOMMENT C
+		WHERE M.MID = C.MCMID
+		  AND MCMUNUM = #{mcMuNum}
+	</select>
+	<insert id="mcWrite" parameterType="mucomment">
+		INSERT INTO MUCOMMENT VALUES(MUCO_SEQ.NEXTVAL,#{mcMid},#{mcMuNum},#{mcContent},SYSDATE)
+	</insert>
+	<update id="mcModify" parameterType="mucomment">
+		UPDATE MUCOMMENT SET MCCONTENT = #{mcContent} WHERE MCCODE = #{mcCode} AND MCMUNUM = #{mcMuNum}
+	</update>
+	<delete id="mcDelete" parameterType="mucomment">
+		DELETE FROM MUCOMMENT WHERE MCCODE = #{mcCode} AND MCMUNUM = #{mcMuNum}
+	</delete>
+
+	<select id="boardWriterView" parameterType="String" resultType="mucomment">
+		SELECT * FROM MUCOMMENT WHERE MCMID = #{boWriter}
+	</select>
+</mapper>
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.CartDAO">
+
+<!-- 장바구니 상품 추가 메소드 -->
+	<insert id="cartListAdd" parameterType="Cart">
+		INSERT INTO CART VALUES(CART_SEQ.NEXTVAL,#{caMid},#{caMuCode},500)
+	</insert>
+	
+<!-- 장바구니 상품 삭제 메소드 -->
+	<delete id="cartListDelete" parameterType="Cart">
+		DELETE FROM CART WHERE CAMID = #{caMid} AND CAMUCODE = #{caMuCode}
+	</delete>
+	
+<!-- 장바구니에 이미 담았는지 확인하는 메소드 -->
+	<select id="CartInCheck" parameterType="Cart" resultType="Cart">
+		SELECT *
+		FROM CART
+		WHERE CAMUCODE = #{caMuCode} AND CAMID = #{caMid}
+		ORDER BY CARCODE
+	</select>
+	
+<!-- 장바구니 목록 출력 -->
+	<select id="ajaxCartList" parameterType="String" resultType="audio">
+		SELECT M.MUCODE, M.MUSINGER, M.MUNAME, M.MUGANRE, M.MUDATE, M.MUIMAGE, M.MULYRICS, M.MUHIT, M.MUPRICE, M.MFILE
+		FROM CART C, MUSIC M
+		WHERE M.MUCODE = C.CAMUCODE AND CAMID = #{mId}
+	</select>
+	<insert id="CartAddPlayList" parameterType="Cart">
+		INSERT INTO CART VALUES(CART_SEQ.NEXTVAL,#{caMid},#{caMuCode},500)
+	</insert>
+
+	<!-- 플레이 리스트에서 장바구니에 이미 담았는지 확인하는 메소드 -->
+	<select id="CartAddCheck" parameterType="Cart" resultType="Cart">
+		SELECT *
+		FROM CART
+		WHERE CAMUCODE = #{caMuCode} AND CAMID = #{caMid}
+		ORDER BY CARCODE
+	</select>
+
+	<delete id="CartAddPlayListDelete" parameterType="Cart">
+		DELETE FROM CART WHERE CAMID = #{caMid} AND CAMUCODE = #{caMuCode}
+	</delete>
+
+</mapper>

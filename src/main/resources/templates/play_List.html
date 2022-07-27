@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<head th:replace="head.html :: head"></head>
+<style>
+	ListArea{
+        overflow: auto;
+    }
+    #playListArea::-webkit-scrollbar{
+        width: 4px;
+    }
+    #playListArea::-webkit-scrollbar-track{
+        background: #222227;
+    }
+    #playListArea::-webkit-scrollbar-thumb{
+        background-color: #0099FF;
+        outline: 1px solid #222227;
+        border-radius: 10px;
+    }
+    input[class="cb1"] + label {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #bcbcbc;
+            cursor: pointer;
+        }
+    input[class="cb1"]:checked + label {
+        background-color: #6699ff;
+    }
+    input[class="cb1"] {
+        display: none;
+    }
+    input[class="cb2"] + label {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #bcbcbc;
+        cursor: pointer;
+    }
+    input[class="cb2"]:checked + label {
+        background-color: #6699ff;
+    }
+    input[class="cb2"] {
+        display: none;
+    }
+</style>
+   
+
+</head>
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<body>
+<header th:replace="header.html :: header"></header>
+<aside th:replace="sidebar.html :: aside"></aside>
+<!-- <footer th:replace="footer.html :: footer"></footer> -->
+
+
+
+<!-- main content -->
+<main class="main">
+    <input th:if = "${session.login ne null}" type="hidden" th:value="${session.login.mId}" th:id="mId">
+    <div class="container-fluid">
+        <div class="row row--grid">
+            <!-- breadcrumb -->
+            <div class="col-12">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb__item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb__item breadcrumb__item--active">재생 목록</li>
+                </ul>
+            </div>
+            <!-- end breadcrumb -->
+
+            <!-- title -->
+            <div class="col-12">
+                <div class="main__title main__title--page">
+                    <h1>PlayList Page</h1>
+                    <th:block th:if="${session.login ne null}">
+                    	<button th:if="${session.login.mId eq tsMid}" class="hero__btn hero__btn--green" id="track" >PlayList 공유</button>
+                    </th:block>
+                </div>
+        
+            </div>
+               
+
+            <!-- end title -->
+
+        </div>
+        </div>
+
+        <div class="tab-content" id="genreArea">
+            <div class="tab-pane fade show active"  role="tabpanel">
+                <div class="row row--grid">
+
+
+
+
+                </div>
+            </div>
+        </div>
+</main>
+
+
+<div id="mplayArea">
+</div>
+</div>
+
+<!-- end main content -->
+
+
+
+
+<input th:if="${session.login ne null}" type="hidden" th:value="${session.login.mId}" th:id="mId">
+<input th:if="${session.login ne null}" type="hidden" th:value="${tsMid}" th:id="tsMid">
+<input th:if="${session.login eq null}" type="hidden" th:value="${tsMid}" th:id="tsMid">
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+</script>
+
+<!-- 규익이꺼 -->
+<script th:if="${session.login ne null}" type="text/javascript" th:inline="javascript">
+var CheckLogin = [[${session.login}]]
+
+if(CheckLogin != null){
+	var sessionId = [[${session.login.mId}]]
+	var tsMid =  $("#tsMid").attr("value");
+
+	console.log("내아이디 아님 : " + tsMid);
+	if(sessionId != tsMid){
+		sessionId = tsMid;
+	} else if(sessionId == tsMid){
+		sessionId = [[${session.login.mId}]]
+	}
+}
+
+
+    $(document).ready(function(){
+
+        on3();
+
+    });
+
+
+    function on3(){
+        $.ajax({
+            type: "POST",
+            url: "playListPrint",
+            data: {
+                "mId": sessionId
+            },
+            dataType: "json",
+            success: (function (result) {
+                console.log(result);
+                playList(result)
+            }),
+            error: function () {
+
+            }
+        });
+
+        function smallCart(list){
+            var cartCountArea = document.getElementById('cartCountArea');
+
+            if(list.length <= 0){
+                cartCountArea.innerHTML = "";
+            } else{
+                cartCountArea.innerHTML = list.length;
+            }
+
+            var output = "";
+
+            if(list.length > 4){
+                output += "<a href='/cartList' class='header__all'>Go to cart</a>";
+                for(var i=0; i<4; i++){
+                    output += "<div class='header__product'>";
+                    output += "<img src='muImage/"+list[i].muImage+"' style='width: 50px; height: 50px; border-radius: 70%; overflow: hidden;'>";
+                    output += "<p><a href='muView?muCode="+list[i].muCode+"&mId="+list[i].muSinger+"'><span id='"+list[i].muCode+"' class='cartMusicName' value='"+list[i].muSinger+"' name='"+list[i].muName+"'>"+list[i].muName+"</span></a></p>";
+                    output += "<span>"+list[i].muSinger+"</span>";
+                    output += "<button id='"+list[i].muCode+"' class='cartDelete' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z'></path></svg></button></div>";
+                }
+            }else if(list.length == 0){
+                output += "<div class='header__product' style='padding-left:33px; padding-right:33px;'>";
+                output += "<span>장바구니가 비어있습니다.</span></div>"
+            }else{
+                output += "<a href='/cartList' class='header__all'>Go to cart</a>";
+                for(var i in list){
+                    output += "<div class='header__product'>";
+                    output += "<img src='muImage/"+list[i].muImage+"' style='width: 50px; height: 50px; border-radius: 70%; overflow: hidden;'>";
+                    output += "<p><a href='muView?muCode="+list[i].muCode+"&mId="+list[i].muSinger+"'><span id='"+list[i].muCode+"' class='cartMusicName' value='"+list[i].muSinger+"' name='"+list[i].muName+"'>"+list[i].muName+"</span></a></p>";
+                    output += "<span>"+list[i].muSinger+"</span>";
+                    output += "<button id='"+list[i].muCode+"' class='cartDelete' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z'></path></svg></button></div>";
+                }
+            }
+
+
+            var smallCartListArea = document.getElementById('smallCartListArea');
+            smallCartListArea.innerHTML = output;
+
+            $(".cartDelete").click(function(){
+
+                var muCode = $(this).attr('id');
+                console.log("muCode : "+muCode);
+
+                $.ajax({
+                    type : "POST",
+                    url : "cartListDelete",
+                    data : {"caMuCode" : muCode,
+                        "caMid" : sessionId
+                    },
+                    dataType : "json",
+                    success : function(list){
+                        smallCart(list);
+                        $("#cartListArea").load(window.location.href + "#cartListArea");
+                        $("#myMusicListArea").load(window.location.href + "#myMusicListArea");
+
+                        $.ajax({
+                            type: "POST",
+                            url: "playListPrint",
+                            data: {
+                                "mId": sessionId
+                            },
+                            dataType: "json",
+                            success: (function (result) {
+                                playList(result)
+                            }),
+                            error: function () {
+
+                            }
+                        });
+                    },
+                    error : function(){
+                        alert('장바구니 삭제 실패');
+                    }
+                });
+            });
+        }
+
+        function playList(result){
+
+            var output="";
+
+            output +="<div class='col-12'>"
+            output +="<div class='main__title'>"
+            output +="<h2><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg><a href='#'>재생 목록</a></h2>"
+            output +="</div>"
+            output +="</div>"
+            output +="</br>"
+            // output +="<button type='button' class='playaddbtn'><img src='icon/plus.png' width='20px' />담기</button>"
+            output +="<table table class='main__table'>";
+            output +="<thead>"
+            output +="<tr>";
+            // output +="<th class='main__table-text'><input type='checkbox' id='cb2' class='cb2'><label for='cb2'></label></th>";
+
+            output +="<th class='main__table-text'> </th>";
+            output +="<th class='main__table-text' style='padding-right:600px;' >곡 정보</th>";
+            output +="<th class='main__table-text'>재생</th>";
+            output +="<th class='main__table-text'>음악장르</th>";
+            output +="<th class='main__table-text'>업로드일</th>";
+            output +="<th class='main__table-text'>조회수</th>";
+            output +="<th class='main__table-text'>좋아요수</th>";
+            output +="<th class='main__table-text'>장바구니</th>";
+            if(sessionId != [[${session.login.mId}]]){
+            	output += "<th class='main__table-text'></th>";
+            } else if(sessionId == [[${session.login.mId}]]){
+            	output += "<th class='main__table-text' style='position: absolute; right: 50px;'>삭제</th>";
+            }
+            
+            output +="</tr>	";
+            output +="</thead>";
+
+
+            for(var i in result){
+                (function(i){
+                    $.ajax({
+                        type: "POST",
+                        url: "playListDeleteAjax",
+                        data: {
+                            "muSinger": sessionId
+                        },
+                        dataType: "json",
+                        async: false,
+                        success: function(playListDeleteResult){
+                            console.log(playListDeleteResult);
+                            $.ajax({
+                                type: "post",
+                                url: "CartAddCheck",
+                                data: {
+                                    "caMuCode": playListDeleteResult[i].plmuCode,
+                                    "caMid": sessionId
+                                },
+                                dataType: "json",
+                                async: false,
+                                success: function(cartAddCheck){
+                                    output +="<tr>";
+                                    // output +="<td><input type='checkbox' id='"+i+"' class='cb1' value="+result[i].muCode+" ><label for='"+i+"'></label></td>";
+                                    // output +="<td><span class='single-item__number'>"+result[i].rn+"</span></td>";
+                                    output +="<td class='main__table-text'><a href='muView?muCode="+result[i].muCode+"&mId="+sessionId+"'><img class='single-item__cover' src='muImage/"+result[i].muImage+"' style='width:50px;'/></a></td>";
+                                    output +="<td class='main__table-text'><h4><a href='muView?muCode="+result[i].muCode+"&mId="+sessionId+"'>"+result[i].muName+"</a></h4><span><a href='boardWriterView?boWriter="+result[i].muSinger+"&mId="+sessionId+"'>"+result[i].muSinger+"</a></span></td>";
+                                    output +="<td><div class='main__table-text'><label><img src='icon/play.png' style='cursor:pointer'><button style='display: none' name = "+i+" class='play' id='mplay' value='"+result[i].mFile+","+result[i].muName+","+result[i].muSinger+","+result[i].muCode+","+result[i].muImage+"'></button ></label></div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muGanre+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muDate+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muHit+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muLike+"</div></td>";
+
+                                    if (cartAddCheck == "") {
+                                        output += "<td><div class='main__table-text'><img id='"+playListDeleteResult[i].plmuCode+"' name='" + playListDeleteResult[i].plmuCode + "' class='PlayListCart' value='Check1' src='icon/cartCheck.png' style='cursor:pointer;' width='25px'/></div></td>";
+                                    } else if (cartAddCheck != "") {
+                                        output += "<td ><div class='main__table-text'><img id='" + playListDeleteResult[i].plmuCode + "' name='" + playListDeleteResult[i].plmuCode + "' class='PlayListCart' value='Check2' src='icon/cartDelete.png' style='cursor:pointer;' width='25px'/></div></td>";
+                                    }
+                                    if(sessionId != [[${session.login.mId}]]){
+                                    	output +="<td><div class='main__table-text'></td>";
+                                    } else if(sessionId == [[${session.login.mId}]]){
+                                    	output +="<td><div class='main__table-text'><a href='#' class='single-item__add' ><button class ='PlayListDelete' type = 'button' value='" + playListDeleteResult[i].plmuCode + "' id='playListDelete'><svg xmlns = 'http://www.w3.org/2000/svg' viewBox = '0 0 24 24'  id='svg1'><path d ='M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z'></path></svg></button></a></div></td>";
+                                    }
+                                    output += "</tr>";
+                                },
+                                error: function(){
+                                    console.log('실패');
+                                },
+                            });
+
+
+                        },
+                        error: function(){
+                            alert('장바구니에 담은 리스트 불러오기 실패');
+                        }
+                    });
+                })(i);
+            }
+            output +="</table>";
+            output +="</br>";
+
+            var genreArea=document.getElementById('genreArea');
+
+            genreArea.innerHTML=output;
+
+            //리스트 삭제 ajax
+            $(document).on('click', '.PlayListDelete', function (plmuCode) {
+                var check = confirm('리스트 항목을 삭제하시겠습니까?');
+
+                var plmuCode = document.getElementById("playListDelete");
+                var plmuCodeVal = $(this).attr('value');
+
+
+                console.log(plmuCode);
+                console.log(plmuCodeVal);
+                console.log('sessionId : ' + sessionId);
+
+                if (check == true) {
+                    $.ajax({
+                        type: "post",
+                        url: "PlayListDelete",
+                        data: {
+                            "plmuCode": plmuCodeVal,
+                            "mId": sessionId
+                        },
+                        dataType: "json",
+
+                        success: function (DeleteResult) {
+                            location.reload();
+                        },
+                        error: function () {
+                            alert('삭제 실패');
+                        }
+                    });
+                } else {
+                    null;
+                }
+
+            });
+
+
+            $("input:checkbox[class=cb2]").on('click', function() {
+                if ( $(this).prop('checked') ) {
+                    $("input:checkbox[class=cb1]").prop("checked", true);
+                }
+                else{
+                    $("input:checkbox[class=cb1]").prop("checked", false);
+                }
+            });
+
+            $(".playaddbtn").click(function(){
+                var obj_length =  $('.cb1').length;
+                for (var i=0; i<obj_length; i++) {
+                    if ( $('.cb1')[i].checked == true) {
+                        var obj_length1 =  $("input:checkbox[class=cb1]:checked").length;
+
+                    }
+                }
+                $("input:checkbox[class=cb1]").prop("checked", false);
+                $("input:checkbox[class=cb2]").prop("checked", false);
+            });
+
+            $(".previousPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                var page1 = page - 1;
+                console.log("page1 : " + page1);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page1,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+
+            });
+
+
+
+
+            $(".cartChange").click(function(){
+
+                var muCode = $(this).attr('id');
+                console.log("muCode : "+muCode);
+
+                var cartCheck = $(this).attr('value');
+
+                if(cartCheck == "Check1"){
+                    $.ajax({
+                        type : "POST",
+                        url : "cartListAdd",
+                        data : {"caMuCode" : muCode,
+                            "caMid" : sessionId
+                        },
+                        dataType : "json",
+                        success : function(list){
+                            $.ajax({
+                                type : "POST",
+                                url : "ajaxCartList",
+                                data : {"caMid" : sessionId},
+                                dataType : "json",
+                                success : function(list){
+                                    smallCart(list);
+                                },
+                                error : function(){
+                                    console.log("장바구니 개수 출력 실패");
+                                }
+                            });
+                            CartAddSuccess(list);
+                        },
+                        error : function(){
+                            alert('장바구니 추가 실패');
+                        }
+                    });
+
+                    function CartAddSuccess(list){
+
+                        var output = "";
+                        output += "<td><img id='"+list.muCode+"' class='cartChange' value='check2' src='icon/cartDelete.png' style='cursor:pointer' width='25px'></td>";
+
+                        var td22 = document.getElementById(muCode);
+                        console.log(td22);
+                        td22.innerHTML = output;
+                    }
+                    $(this).attr("src", "icon/cartDelete.png");
+                    cartCheck = $(this).attr('value','Check2');
+
+                }else if(cartCheck == "Check2"){
+                    $.ajax({
+                        type : "POST",
+                        url : "cartListDelete",
+                        data : {"caMuCode" : muCode,
+                            "caMid" : sessionId
+                        },
+                        dataType : "json",
+                        success : function(list){
+                            $.ajax({
+                                type : "POST",
+                                url : "ajaxCartList",
+                                data : {"caMid" : sessionId},
+                                dataType : "json",
+                                success : function(list){
+                                    smallCart(list);
+                                },
+                                error : function(){
+                                    console.log("장바구니 개수 출력 실패");
+                                }
+                            });
+                            CartDeleteSuccess(list);
+                        },
+                        error : function(){
+                            alert('장바구니 삭제 실패');
+                        }
+                    });
+
+                    function CartDeleteSuccess(list){
+
+                        var output = "";
+
+                        output += "<td><img id='"+list.muCode+"' class='cartChange' value='check2' src='icon/cartDelete.png' style='cursor:pointer' width='25px'></td>";
+
+
+                        var td22 = document.getElementById(muCode);
+                        console.log(td22);
+                        td22.innerHTML = output;
+                    }
+
+                    $(this).attr("src", "icon/cartCheck.png");
+                    cartCheck = $(this).attr('value','Check2');
+
+                }
+            });
+
+
+
+
+            $(".selectMusicDownload").click(function(){
+
+                var selectDownloadMusicCode = $(this).attr("id");
+                console.log(selectDownloadMusicCode);
+                console.log(sessionId);
+
+                var selectMusicCode = selectDownloadMusicCode.replace("download","");
+                console.log(selectMusicCode);
+
+                $.ajax({
+                    type: "POST",
+                    url: "downloadTableInsert",
+                    data: {"mudMuCode": selectMusicCode,
+                        "mudMid": sessionId},
+                    dataType: "json",
+                    success : function(list){
+                    },
+                    error : function(){
+                        console.log('다운로드 테이블 등록 실패');
+                    }
+                });
+
+            });
+
+
+            $(".play").click(function(){
+
+
+                var aa = new Array();
+                console.log(aa);
+
+                var playlength = $(".play").length;
+                console.log("1"+playlength);
+
+                var idx = $(this).attr('name');
+                console.log(idx);
+
+                for(var i=0; i < playlength; i++){
+                    aa[i] = i;
+
+                    if(idx == aa[i]){
+                        var aaa = idx;
+                    }
+                }
+                console.log(aa);
+                console.log(aaa);
+
+
+                $(".player").remove();
+                var head= document.getElementsByTagName('html')[0];
+                var script= document.createElement('script');
+                var script1= document.createElement('script');
+                var script2= document.createElement('script');
+                var script3= document.createElement('script');
+                var script4= document.createElement('script');
+                var script5= document.createElement('script');
+
+                script.src= 'js/owl.carousel.min.js';
+                head.appendChild(script);
+
+                script1.src= 'js/jquery.magnific-popup.min.js';
+                head.appendChild(script1);
+
+                script2.src= 'js/select2.min.js"';
+                head.appendChild(script2);
+
+                script3.src= 'js/jquery.inputmask.min.js';
+                head.appendChild(script3);
+
+                script4.src= 'js/plyr.min.js';
+                head.appendChild(script4);
+
+                script5.src= 'js/main.js';
+                head.appendChild(script5);
+
+                var mContent = $(this).attr('value');
+                var array = mContent.split(",");
+                var mFile = array[0];
+                var muName = array[1];
+                var muSinger = array[2];
+                var muCode = array[3];
+                var muImage = array[4];
+
+
+                console.log(mFile);
+                console.log(muName);
+
+                var output="<div class='player'>"
+                output+="<div class='player__cover'>"
+                output+="<img src='muImage/"+muImage+"' alt=''></div>";
+                output+="<div class='player__content'>";
+                output+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                output+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                output+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                var mplayArea= document.getElementsByTagName('body')[0];
+                mplayArea.insertAdjacentHTML("afterend", output);
+
+                /* var mplayArea=document.getElementById('mplayArea');
+                mplayArea.innerHTML=output;  */
+                audio.play();
+                //.plyr__control--prev
+                $(document).on('click','.plyr__control--next', function(e){ //동적으로 생성이되서 이벤트를 사용하지 못하여 document 추가
+
+                    aaa++;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+
+                });
+
+
+
+
+                $(document).on('click','.plyr__control--prev', function(e){ //동적으로 생성이되서 이벤트를 사용하지 못하여 document 추가
+
+                    aaa--;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+                });
+
+                document.addEventListener("ended", function(){
+                    aaa++;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' class='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+                });
+            });
+
+
+
+
+            $(".selectPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+
+            });
+
+
+            $(".nextPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                var page2 = parseInt(page) + 1;
+
+                console.log("page2 : " + page2);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page2,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+            });
+
+
+        }
+        $(document).on('click', '.PlayListCart', function () {
+            var plmuCode = $(this).attr('name');
+
+            var cartCheck = $(this).attr('value');
+            var imgId = $(this).attr('id');
+            console.log("class:" + cartCheck);
+            console.log('plmucode' + plmuCode);
+            console.log('아이디 : ' + sessionId);
+            console.log('이미지 아이디 : ' + imgId);
+            if (cartCheck == "Check1") {
+                $.ajax({
+                    type: "post",
+                    url: "CartAddPlayList",
+                    data: {
+                        "caMuCode": plmuCode,
+                        "caMid": sessionId
+                    },
+                    dataType: "json",
+                    success: function (Result) {
+                        console.log("insert 성공")
+                        $.ajax({
+                            type : "POST",
+                            url : "ajaxCartList",
+                            data : {"caMid" : sessionId},
+                            dataType : "json",
+                            success : function(list){
+                                smallCart(list);
+                            },
+                            error : function(){
+                                console.log("장바구니 개수 출력 실패");
+                            }
+                        });
+                    },
+                    error: function () {
+                        console.log("인설트 오류가 숨어있다!!")
+                    }
+                });
+                cartCheck = $(this).attr('value', 'Check2');
+                $(this).attr('src', '/img/cartDelete.png');
+            } else if (cartCheck == "Check2") {
+                $.ajax({
+                    type: "post",
+                    url: "CartAddPlayListDelete",
+                    data: {
+                        "caMuCode": plmuCode,
+                        "caMid": sessionId
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        $.ajax({
+                            type : "POST",
+                            url : "ajaxCartList",
+                            data : {"caMid" : sessionId},
+                            dataType : "json",
+                            success : function(list){
+                                smallCart(list);
+                            },
+                            error : function(){
+                                console.log("장바구니 개수 출력 실패");
+                            }
+                        });
+                        console.log("삭제 성공")
+                    },
+                    error: function () {
+                        console.log("삭제 오류가 숨어있다!!")
+                    }
+                });
+                cartCheck = $(this).attr('value', 'Check1');
+                $(this).attr('src', '/img/cartCheck.png');
+            }
+
+        });
+        
+    }
+
+
+
+</script>
+<script th:if="${session.login eq null}" type="text/javascript" th:inline="javascript">
+
+var sessionId = "nullId";
+var tsMid =  $("#tsMid").attr("value");
+
+console.log("내아이디 아님 : " + tsMid);
+if(sessionId != tsMid){
+	sessionId = tsMid;
+} else if(sessionId == tsMid){
+	sessionId = "nullId";
+}
+
+    $(document).ready(function(){
+
+        on3();
+
+    });
+
+
+    function on3(){
+        $.ajax({
+            type: "POST",
+            url: "playListPrint",
+            data: {
+                "mId": sessionId
+            },
+            dataType: "json",
+            success: (function (result) {
+                console.log(result);
+                playList(result)
+            }),
+            error: function () {
+
+            }
+        });
+
+        function smallCart(list){
+            var cartCountArea = document.getElementById('cartCountArea');
+
+            if(list.length <= 0){
+                cartCountArea.innerHTML = "";
+            } else{
+                cartCountArea.innerHTML = list.length;
+            }
+
+            var output = "";
+
+            if(list.length > 4){
+                output += "<a href='/cartList' class='header__all'>Go to cart</a>";
+                for(var i=0; i<4; i++){
+                    output += "<div class='header__product'>";
+                    output += "<img src='muImage/"+list[i].muImage+"' style='width: 50px; height: 50px; border-radius: 70%; overflow: hidden;'>";
+                    output += "<p><a href='muView?muCode="+list[i].muCode+"&mId="+list[i].muSinger+"'><span id='"+list[i].muCode+"' class='cartMusicName' value='"+list[i].muSinger+"' name='"+list[i].muName+"'>"+list[i].muName+"</span></a></p>";
+                    output += "<span>"+list[i].muSinger+"</span>";
+                    output += "<button id='"+list[i].muCode+"' class='cartDelete' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z'></path></svg></button></div>";
+                }
+            }else if(list.length == 0){
+                output += "<div class='header__product' style='padding-left:33px; padding-right:33px;'>";
+                output += "<span>장바구니가 비어있습니다.</span></div>"
+            }else{
+                output += "<a href='/cartList' class='header__all'>Go to cart</a>";
+                for(var i in list){
+                    output += "<div class='header__product'>";
+                    output += "<img src='muImage/"+list[i].muImage+"' style='width: 50px; height: 50px; border-radius: 70%; overflow: hidden;'>";
+                    output += "<p><a href='muView?muCode="+list[i].muCode+"&mId="+list[i].muSinger+"'><span id='"+list[i].muCode+"' class='cartMusicName' value='"+list[i].muSinger+"' name='"+list[i].muName+"'>"+list[i].muName+"</span></a></p>";
+                    output += "<span>"+list[i].muSinger+"</span>";
+                    output += "<button id='"+list[i].muCode+"' class='cartDelete' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z'></path></svg></button></div>";
+                }
+            }
+
+
+            var smallCartListArea = document.getElementById('smallCartListArea');
+            smallCartListArea.innerHTML = output;
+
+            $(".cartDelete").click(function(){
+
+                var muCode = $(this).attr('id');
+                console.log("muCode : "+muCode);
+
+                $.ajax({
+                    type : "POST",
+                    url : "cartListDelete",
+                    data : {"caMuCode" : muCode,
+                        "caMid" : sessionId
+                    },
+                    dataType : "json",
+                    success : function(list){
+                        smallCart(list);
+                        $("#cartListArea").load(window.location.href + "#cartListArea");
+                        $("#myMusicListArea").load(window.location.href + "#myMusicListArea");
+
+                        $.ajax({
+                            type : "POST",
+                            url : "balGenre",
+                            dataType:'json',
+                            success : function(list){
+                                genrelist(list);
+                            },
+                            error : function(){
+                                alert("실패");
+                            }
+                        });
+                    },
+                    error : function(){
+                        alert('장바구니 삭제 실패');
+                    }
+                });
+            });
+        }
+
+        function playList(result){
+
+            var output="";
+
+            output +="<div class='col-12'>"
+            output +="<div class='main__title'>"
+            output +="<h2><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg><a href='#'>재생 목록</a></h2>"
+            output +="</div>"
+            output +="</div>"
+            output +="</br>"
+            // output +="<button type='button' class='playaddbtn'><img src='icon/plus.png' width='20px' />담기</button>"
+            output +="<table table class='main__table'>";
+            output +="<thead>"
+            output +="<tr>";
+            // output +="<th class='main__table-text'><input type='checkbox' id='cb2' class='cb2'><label for='cb2'></label></th>";
+
+            output +="<th class='main__table-text'> </th>";
+            output +="<th class='main__table-text' style='padding-right:600px;' >곡 정보</th>";
+            output +="<th class='main__table-text'>재생</th>";
+            output +="<th class='main__table-text'>음악장르</th>";
+            output +="<th class='main__table-text'>업로드일</th>";
+            output +="<th class='main__table-text'>조회수</th>";
+            output +="<th class='main__table-text'>좋아요수</th>";
+            output +="</tr>	";
+            output +="</thead>";
+
+
+            for(var i in result){
+                (function(i){
+                    $.ajax({
+                        type: "POST",
+                        url: "playListDeleteAjax",
+                        data: {
+                            "muSinger": sessionId
+                        },
+                        dataType: "json",
+                        async: false,
+                        success: function(playListDeleteResult){
+                            console.log(playListDeleteResult);
+                            $.ajax({
+                                type: "post",
+                                url: "CartAddCheck",
+                                data: {
+                                    "caMuCode": playListDeleteResult[i].plmuCode,
+                                    "caMid": sessionId
+                                },
+                                dataType: "json",
+                                async: false,
+                                success: function(cartAddCheck){
+                                    output +="<tr>";
+                                    // output +="<td><input type='checkbox' id='"+i+"' class='cb1' value="+result[i].muCode+" ><label for='"+i+"'></label></td>";
+                                    // output +="<td><span class='single-item__number'>"+result[i].rn+"</span></td>";
+                                    output +="<td class='main__table-text'><a href='muView?muCode="+result[i].muCode+"&mId="+sessionId+"'><img class='single-item__cover' src='muImage/"+result[i].muImage+"' style='width:50px;'/></a></td>";
+                                    output +="<td class='main__table-text'><h4><a href='muView?muCode="+result[i].muCode+"&mId="+sessionId+"'>"+result[i].muName+"</a></h4><span><a href='boardWriterView?boWriter="+result[i].muSinger+"&mId="+sessionId+"'>"+result[i].muSinger+"</a></span></td>";
+                                    output +="<td><div class='main__table-text'><label><img src='icon/play.png' style='cursor:pointer'><button style='display: none' name = "+i+" class='play' id='mplay' value='"+result[i].mFile+","+result[i].muName+","+result[i].muSinger+","+result[i].muCode+","+result[i].muImage+"'></button ></label></div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muGanre+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muDate+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muHit+"</div></td>";
+                                    output +="<td><div class='main__table-text'>"+result[i].muLike+"</div></td>";
+
+                                    output += "</tr>";
+                                },
+                                error: function(){
+                                    console.log('실패');
+                                },
+                            });
+
+
+                        },
+                        error: function(){
+                            alert('장바구니에 담은 리스트 불러오기 실패');
+                        }
+                    });
+                })(i);
+            }
+            output +="</table>";
+            output +="</br>";
+
+            var genreArea=document.getElementById('genreArea');
+
+            genreArea.innerHTML=output;
+
+            //리스트 삭제 ajax
+            $(document).on('click', '.PlayListDelete', function (plmuCode) {
+                var check = confirm('리스트 항목을 삭제하시겠습니까?');
+
+                var plmuCode = document.getElementById("playListDelete");
+                var plmuCodeVal = $(this).attr('value');
+
+
+                console.log(plmuCode);
+                console.log(plmuCodeVal);
+                console.log('sessionId : ' + sessionId);
+
+                if (check == true) {
+                    $.ajax({
+                        type: "post",
+                        url: "PlayListDelete",
+                        data: {
+                            "plmuCode": plmuCodeVal,
+                            "mId": sessionId
+                        },
+                        dataType: "json",
+
+                        success: function (DeleteResult) {
+                            location.reload();
+                        },
+                        error: function () {
+                            alert('삭제 실패');
+                        }
+                    });
+                } else {
+                    null;
+                }
+
+            });
+
+
+            $("input:checkbox[class=cb2]").on('click', function() {
+                if ( $(this).prop('checked') ) {
+                    $("input:checkbox[class=cb1]").prop("checked", true);
+                }
+                else{
+                    $("input:checkbox[class=cb1]").prop("checked", false);
+                }
+            });
+
+            $(".playaddbtn").click(function(){
+                var obj_length =  $('.cb1').length;
+                for (var i=0; i<obj_length; i++) {
+                    if ( $('.cb1')[i].checked == true) {
+                        var obj_length1 =  $("input:checkbox[class=cb1]:checked").length;
+
+                    }
+                }
+                $("input:checkbox[class=cb1]").prop("checked", false);
+                $("input:checkbox[class=cb2]").prop("checked", false);
+            });
+
+            $(".previousPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                var page1 = page - 1;
+                console.log("page1 : " + page1);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page1,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+
+            });
+
+
+
+
+            $(".cartChange").click(function(){
+
+                var muCode = $(this).attr('id');
+                console.log("muCode : "+muCode);
+
+                var cartCheck = $(this).attr('value');
+
+                if(cartCheck == "Check1"){
+                    $.ajax({
+                        type : "POST",
+                        url : "cartListAdd",
+                        data : {"caMuCode" : muCode,
+                            "caMid" : sessionId
+                        },
+                        dataType : "json",
+                        success : function(list){
+                            $.ajax({
+                                type : "POST",
+                                url : "ajaxCartList",
+                                data : {"caMid" : sessionId},
+                                dataType : "json",
+                                success : function(list){
+                                    smallCart(list);
+                                },
+                                error : function(){
+                                    console.log("장바구니 개수 출력 실패");
+                                }
+                            });
+                            CartAddSuccess(list);
+                        },
+                        error : function(){
+                            alert('장바구니 추가 실패');
+                        }
+                    });
+
+                    function CartAddSuccess(list){
+
+                        var output = "";
+                        output += "<td><img id='"+list.muCode+"' class='cartChange' value='check2' src='icon/cartDelete.png' style='cursor:pointer' width='25px'></td>";
+
+                        var td22 = document.getElementById(muCode);
+                        console.log(td22);
+                        td22.innerHTML = output;
+                    }
+                    $(this).attr("src", "icon/cartDelete.png");
+                    cartCheck = $(this).attr('value','Check2');
+
+                }else if(cartCheck == "Check2"){
+                    $.ajax({
+                        type : "POST",
+                        url : "cartListDelete",
+                        data : {"caMuCode" : muCode,
+                            "caMid" : sessionId
+                        },
+                        dataType : "json",
+                        success : function(list){
+                            $.ajax({
+                                type : "POST",
+                                url : "ajaxCartList",
+                                data : {"caMid" : sessionId},
+                                dataType : "json",
+                                success : function(list){
+                                    smallCart(list);
+                                },
+                                error : function(){
+                                    console.log("장바구니 개수 출력 실패");
+                                }
+                            });
+                            CartDeleteSuccess(list);
+                        },
+                        error : function(){
+                            alert('장바구니 삭제 실패');
+                        }
+                    });
+
+                    function CartDeleteSuccess(list){
+
+                        var output = "";
+
+                        output += "<td><img id='"+list.muCode+"' class='cartChange' value='check2' src='icon/cartDelete.png' style='cursor:pointer' width='25px'></td>";
+
+
+                        var td22 = document.getElementById(muCode);
+                        console.log(td22);
+                        td22.innerHTML = output;
+                    }
+
+                    $(this).attr("src", "icon/cartCheck.png");
+                    cartCheck = $(this).attr('value','Check2');
+
+                }
+            });
+
+
+
+
+            $(".selectMusicDownload").click(function(){
+
+                var selectDownloadMusicCode = $(this).attr("id");
+                console.log(selectDownloadMusicCode);
+                console.log(sessionId);
+
+                var selectMusicCode = selectDownloadMusicCode.replace("download","");
+                console.log(selectMusicCode);
+
+                $.ajax({
+                    type: "POST",
+                    url: "downloadTableInsert",
+                    data: {"mudMuCode": selectMusicCode,
+                        "mudMid": sessionId},
+                    dataType: "json",
+                    success : function(list){
+                    },
+                    error : function(){
+                        console.log('다운로드 테이블 등록 실패');
+                    }
+                });
+
+            });
+
+
+            $(".play").click(function(){
+
+
+                var aa = new Array();
+                console.log(aa);
+
+                var playlength = $(".play").length;
+                console.log("1"+playlength);
+
+                var idx = $(this).attr('name');
+                console.log(idx);
+
+                for(var i=0; i < playlength; i++){
+                    aa[i] = i;
+
+                    if(idx == aa[i]){
+                        var aaa = idx;
+                    }
+                }
+                console.log(aa);
+                console.log(aaa);
+
+
+                $(".player").remove();
+                var head= document.getElementsByTagName('html')[0];
+                var script= document.createElement('script');
+                var script1= document.createElement('script');
+                var script2= document.createElement('script');
+                var script3= document.createElement('script');
+                var script4= document.createElement('script');
+                var script5= document.createElement('script');
+
+                script.src= 'js/owl.carousel.min.js';
+                head.appendChild(script);
+
+                script1.src= 'js/jquery.magnific-popup.min.js';
+                head.appendChild(script1);
+
+                script2.src= 'js/select2.min.js"';
+                head.appendChild(script2);
+
+                script3.src= 'js/jquery.inputmask.min.js';
+                head.appendChild(script3);
+
+                script4.src= 'js/plyr.min.js';
+                head.appendChild(script4);
+
+                script5.src= 'js/main.js';
+                head.appendChild(script5);
+
+                var mContent = $(this).attr('value');
+                var array = mContent.split(",");
+                var mFile = array[0];
+                var muName = array[1];
+                var muSinger = array[2];
+                var muCode = array[3];
+                var muImage = array[4];
+
+
+                console.log(mFile);
+                console.log(muName);
+
+                var output="<div class='player'>"
+                output+="<div class='player__cover'>"
+                output+="<img src='muImage/"+muImage+"' alt=''></div>";
+                output+="<div class='player__content'>";
+                output+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                output+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                output+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                var mplayArea= document.getElementsByTagName('body')[0];
+                mplayArea.insertAdjacentHTML("afterend", output);
+
+                /* var mplayArea=document.getElementById('mplayArea');
+                mplayArea.innerHTML=output;  */
+                audio.play();
+                //.plyr__control--prev
+                $(document).on('click','.plyr__control--next', function(e){ //동적으로 생성이되서 이벤트를 사용하지 못하여 document 추가
+
+                    aaa++;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+
+                });
+
+
+
+
+                $(document).on('click','.plyr__control--prev', function(e){ //동적으로 생성이되서 이벤트를 사용하지 못하여 document 추가
+
+                    aaa--;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+                });
+
+                document.addEventListener("ended", function(){
+                    aaa++;
+
+                    var idx2 = parseInt(aaa);
+
+                    console.log(idx2);
+
+                    var playlist1 = $('.play')[idx2];
+                    console.log(playlist1);
+
+                    $(".player").remove();
+                    var head= document.getElementsByTagName('html')[0];
+                    var script= document.createElement('script');
+                    var script1= document.createElement('script');
+                    var script2= document.createElement('script');
+                    var script3= document.createElement('script');
+                    var script4= document.createElement('script');
+                    var script5= document.createElement('script');
+
+                    script.src= 'js/owl.carousel.min.js';
+                    head.appendChild(script);
+
+                    script1.src= 'js/jquery.magnific-popup.min.js';
+                    head.appendChild(script1);
+
+                    script2.src= 'js/select2.min.js"';
+                    head.appendChild(script2);
+
+                    script3.src= 'js/jquery.inputmask.min.js';
+                    head.appendChild(script3);
+
+                    script4.src= 'js/plyr.min.js';
+                    head.appendChild(script4);
+
+                    script5.src= 'js/main.js';
+                    head.appendChild(script5);
+
+                    var testtt = $(playlist1).attr('value');
+                    var array = testtt.split(",");
+                    var mFile = array[0];
+                    var muName = array[1];
+                    var muSinger = array[2];
+                    var muCode = array[3];
+                    var muImage = array[4];
+
+                    var output1="<div class='player'>"
+                    output1+="<div class='player__cover'>"
+                    output1+="<img src='muImage/"+muImage+"' alt=''></div>";
+                    output1+="<div class='player__content'>";
+                    output1+="<span class='player__track'><b class='player__title'>"+muName+"</b>-<span class='player__artist'>"+muSinger+"</span></span>";
+                    output1+="<audio src='/audio/"+mFile+"' id='audio' class='audio' controls></audio></div></div>"
+                    output1+="<button class='player__btn' type='button'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z'/></svg> Player</button>";
+
+                    var mplayArea= document.getElementsByTagName('body')[0];
+                    mplayArea.insertAdjacentHTML("afterend", output1);
+                    audio.play();
+                });
+            });
+
+
+
+
+            $(".selectPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+
+            });
+
+
+            $(".nextPage").click(function(){
+                var page = $(this).attr('id');
+                console.log("page : "+page);
+
+                var limit = $(this).attr('value');
+                console.log("limit : "+limit);
+
+                var page2 = parseInt(page) + 1;
+
+                console.log("page2 : " + page2);
+
+                $.ajax({
+                    type : "POST",
+                    url : "balGenre",
+                    data : {"page" : page2,
+                        "limit" : limit},
+                    dataType : "json",
+                    success : function(list){
+                        genrelist(list);
+                    },
+                    error : function(){
+                        alert('음악목록 실패');
+                    }
+                });
+            });
+
+
+        }
+        $(document).on('click', '.PlayListCart', function () {
+            var plmuCode = $(this).attr('name');
+
+            var cartCheck = $(this).attr('value');
+            var imgId = $(this).attr('id');
+            console.log("class:" + cartCheck);
+            console.log('plmucode' + plmuCode);
+            console.log('아이디 : ' + sessionId);
+            console.log('이미지 아이디 : ' + imgId);
+            if (cartCheck == "Check1") {
+                $.ajax({
+                    type: "post",
+                    url: "CartAddPlayList",
+                    data: {
+                        "caMuCode": plmuCode,
+                        "caMid": sessionId
+                    },
+                    dataType: "json",
+                    success: function (Result) {
+                        console.log("insert 성공")
+                        $.ajax({
+                            type : "POST",
+                            url : "ajaxCartList",
+                            data : {"caMid" : sessionId},
+                            dataType : "json",
+                            success : function(list){
+                                smallCart(list);
+                            },
+                            error : function(){
+                                console.log("장바구니 개수 출력 실패");
+                            }
+                        });
+                    },
+                    error: function () {
+                        console.log("인설트 오류가 숨어있다!!")
+                    }
+                });
+                cartCheck = $(this).attr('value', 'Check2');
+                $(this).attr('src', '/img/cartDelete.png');
+            } else if (cartCheck == "Check2") {
+                $.ajax({
+                    type: "post",
+                    url: "CartAddPlayListDelete",
+                    data: {
+                        "caMuCode": plmuCode,
+                        "caMid": sessionId
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        $.ajax({
+                            type : "POST",
+                            url : "ajaxCartList",
+                            data : {"caMid" : sessionId},
+                            dataType : "json",
+                            success : function(list){
+                                smallCart(list);
+                            },
+                            error : function(){
+                                console.log("장바구니 개수 출력 실패");
+                            }
+                        });
+                        console.log("삭제 성공")
+                    },
+                    error: function () {
+                        console.log("삭제 오류가 숨어있다!!")
+                    }
+                });
+                cartCheck = $(this).attr('value', 'Check1');
+                $(this).attr('src', '/img/cartCheck.png');
+            }
+
+        });
+
+        $("#track").click(function () {
+        	$.ajax({
+        		type : "post",
+        		url : "trackShare",
+        		data : {"tsMid" : sessionId},
+        		dataType : "json",
+        		success : function(result){
+        			console.log("리스트 집어넣기 성공");
+        			$("#track").attr("disabled",true	);
+        		},
+        		error : function(){
+        			console.log("실패");
+        		}
+        		
+        		
+        	});
+        	
+        });
+        
+    }
+
+
+
+</script>
+<!-- JS -->
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/jquery.magnific-popup.min.js"></script>
+<script src="js/smooth-scrollbar.js"></script>
+<script src="js/select2.min.js"></script>
+<script src="js/slider-radio.js"></script>
+<script src="js/jquery.inputmask.min.js"></script>
+<script src="js/plyr.min.js"></script>
+<script src="js/main.js"></script>
+</html>

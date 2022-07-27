@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.uploadDao">
+
+    <insert id="fileUpload" parameterType="audio">
+        INSERT INTO MUSIC
+        VALUES (MUSIC_SEQ.NEXTVAL, #{muSinger}, #{muName}, #{muGanre},
+                SYSDATE, #{muImage, jdbcType=VARCHAR}, 0,500,#{mFile},#{muLyrics},0)
+    </insert>
+    <select id="fileList" parameterType="paging" resultType="audio">
+        SELECT * FROM ( SELECT ROWNUM NUM, MYPAGING.* FROM MYPAGING WHERE MUSINGER = #{mId}) WHERE NUM BETWEEN #{startRow} AND #{endRow}
+    </select>
+    <select id="muView" parameterType="audio" resultType="audio">
+        SELECT *
+        FROM MUSIC
+        WHERE MUCODE = #{muCode}
+    </select>
+    <!--좋아요 상태 확인 -->
+    <select id="LikeCheck" parameterType="mulike" resultType="String">
+        SELECT MULMID
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{muCode}
+          AND MULMID = #{mId}
+    </select>
+
+    <!--음악 좋아요 테이블에서 좋아요 개수 확인-->
+    <select id="LikeListCount" parameterType="mulike" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{muCode}
+    </select>
+
+    <select id="memberView" parameterType="String" resultType="member">
+        SELECT *
+        FROM MEMBER
+        WHERE MID = #{mId}
+    </select>
+
+
+    <select id="muListCount" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSIC
+    </select>
+       <select id="muListCount1" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSIC WHERE MUSINGER = #{mId}
+    </select>
+    <update id="fileModify" parameterType="audio">
+        UPDATE MUSIC
+        SET MUNAME   =#{muName},
+            MUGANRE  =#{muGanre},
+            MUIMAGE  =#{muImage, jdbcType=VARCHAR},
+            MULYRICS =#{muLyrics},
+            MUPRICE  =#{muPrice},
+            MFILE    =#{mFile}
+        WHERE MUCODE = #{muCode}
+    </update>
+    <delete id="fileDelete" parameterType="int">
+        DELETE
+        FROM MUSIC
+        WHERE MUCODE = #{muCode}
+    </delete>
+
+    <update id="muCount" parameterType="int">
+        UPDATE MUSIC
+        SET MUHIT = MUHIT + 1
+        WHERE MUCODE = #{muCode}
+    </update>
+
+    <select id="LikeList" parameterType="int" resultType="audio">
+        SELECT *
+        FROM MUSIC
+        WHERE MUCODE = #{muCode}
+    </select>
+
+
+    <!--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+    <!-- 좋아요 +1 sql-->
+    <insert id="LikeUp" parameterType="mulike">
+
+        INSERT INTO MUSICLIKE
+        VALUES (MULIKE_SEQ.NEXTVAL, #{mulmuCode}, #{mulMid})
+    </insert>
+
+
+    <select id="LikeTableUpCheck" parameterType="mulike" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{mulmuCode}
+    </select>
+
+
+    <!--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+    <!--좋아요 취소 sql -->
+    <delete id="LikeDown" parameterType="mulike">
+        DELETE
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{mulmuCode}
+          AND MULMID = #{mulMid}
+    </delete>
+
+    <select id="LikeTableDownCheck" parameterType="mulike" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{mulmuCode}
+    </select>
+
+    <!--/////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+    <!--    <select id="mlList" parameterType="int" resultType="member">-->
+    <!--        SELECT M.MID, M.MPROFILENAME-->
+    <!--        FROM MEMBER M,-->
+    <!--             MUSICLIKE-->
+    <!--        WHERE MID = MULMID-->
+    <!--          AND MULMUCODE = #{mulmuCode}-->
+    <!--    </select>-->
+
+    <select id="MusicLikeList" parameterType="int" resultType="mulike">
+        SELECT *
+        FROM MUSICLIKEPAGING
+        WHERE RN BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+    <select id="MusicLikeCount" parameterType="mulike" resultType="int">
+        SELECT COUNT(*)
+        FROM MUSICLIKE
+    </select>
+
+
+    <select id="boardWriterView" parameterType="String" resultType="audio">
+        SELECT *
+        FROM MUSIC
+        WHERE MUSINGER = #{boWriter}
+    </select>
+
+    <!-- 전체 음악 목록 메소드 -->
+    <select id="ajaxFileList" resultType="audio">
+        SELECT M.MNAME, P.*
+		FROM PAGING P, MEMBER M
+        WHERE RN BETWEEN #{startRow} AND #{endRow} AND M.MID = P.MUSINGER
+    </select>
+
+
+    <delete id="LikeDelete" parameterType="mulike">
+        DELETE
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{mulmuCode}
+          AND MULMID = #{mulMid}
+    </delete>
+
+    <select id="LikeDeleteCheck" parameterType="mulike" resultType="mulike">
+        SELECT *
+        FROM MUSICLIKE
+        WHERE MULMUCODE = #{mulmuCode}
+          AND MULMID = #{mulMid}
+    </select>
+
+<update id="LikeUp2" parameterType="mulike">
+		UPDATE MUSIC
+        SET MULIKE = MULIKE + 1
+        WHERE MUCODE = #{mulmuCode}
+</update>
+
+<update id="LikeDown2" parameterType="mulike">
+		UPDATE MUSIC
+        SET MULIKE = MULIKE -1
+        WHERE MUCODE = #{mulmuCode}
+</update>
+   
+
+<select id="LikeMid" parameterType="int" resultType="mulike">
+    SELECT MULMID FROM MUSICLIKE WHERE MULCODE = #{mulCode}
+</select>
+<!--<select id="LikeListCount" parameterType="int" >-->
+<!--    SELECT COUNT(*)-->
+<!--    FROM MUSICLIKE WHERE MULMUCODE = #{mulCode}-->
+<!--</select>-->
+
+
+    <select id="LikemodalList" parameterType="int" resultType="member">
+        SELECT M.MID, M.MPROFILENAME, M.MNAME
+        FROM MEMBER M,
+             MUSICLIKE
+        WHERE MID = MULMID
+          AND MULMUCODE = #{mulmuCode}
+    </select>
+    <!--<select id="LikeListCount" parameterType="int" >-->
+    <!--    SELECT COUNT(*)-->
+    <!--    FROM MUSICLIKE WHERE MULMUCODE = #{mulCode}-->
+    <!--</select>-->
+    
+<!-- 내가 올린 음악 리스트(ajax) -->
+	<select id="MyMusicList" parameterType="String" resultType="audio">
+		SELECT * FROM MUSIC WHERE MUSINGER = #{muSinger}
+	</select>
+	
+<!-- 음악 삭제 메소드 (ajax) -->
+	<delete id="ajaxMusicDelete" parameterType="int">
+		DELETE FROM MUSIC WHERE MUCODE = #{muCode}
+	</delete>
+
+</mapper>

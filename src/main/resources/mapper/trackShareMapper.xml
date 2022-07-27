@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icia.musicwired.dao.trackShareDAO">
+    <!--playList 테이블에 insert -->
+    <insert id="trackShare" parameterType="track">
+        INSERT INTO TRACKSHARE
+        VALUES (TRACK_SEQ.NEXTVAL, #{tsMid})
+    </insert>
+	<select id="trackShareSearch" parameterType="String" resultType="track">
+		SELECT * FROM TRACKSHARE WHERE TSMID = #{tsMid}
+	</select>
+    <select id="track" resultType="track">
+     SELECT M.MNAME, M.MPROFILENAME ,T.*
+        FROM MEMBER M,
+             TRACKSHARE T
+        WHERE  MID = TSMID 
+    </select>
+</mapper>

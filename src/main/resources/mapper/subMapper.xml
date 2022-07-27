@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.subDAO">
+
+    <insert id="subreg" parameterType="sub">
+        INSERT INTO SUBSCRIPTION
+        VALUES (SUB_SEQ.NEXTVAL, #{ssMid}, #{sserMid})
+    </insert>
+    <select id="addCount" parameterType="sub" resultType="int">
+        SELECT COUNT(*)
+        FROM SUBSCRIPTION
+        WHERE SSERMID = #{sserMid}
+    </select>
+    <delete id="subcancel" parameterType="sub">
+        DELETE
+        FROM SUBSCRIPTION
+        WHERE SSMID = #{ssMid} AND SSERMID = #{sserMid}
+    </delete>
+    <select id="minusCount" parameterType="sub" resultType="int">
+        SELECT COUNT(*)
+        FROM SUBSCRIPTION
+        WHERE SSERMID = #{sserMid}
+    </select>
+    <select id="submodalList" resultType="Member" parameterType="String">
+        SELECT M.MID, M.MPROFILENAME
+        FROM MEMBER M,
+             SUBSCRIPTION S
+        WHERE MID = SSMID
+          AND SSERMID = #{sserMid}
+    </select>
+    <select id="subermodalList" resultType="Member" parameterType="String">
+    	SELECT M.MID, M.MPROFILENAME
+	    FROM MEMBER M, SUBSCRIPTION S
+	    WHERE MID = SSERMID AND SSMID = #{ssMid}
+    </select>
+
+</mapper>

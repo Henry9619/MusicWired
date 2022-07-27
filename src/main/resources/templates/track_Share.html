@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="kooky"/>
+    <meta name="description" content="inputBoot index"/>
+    <title>Title</title>
+</head>
+
+<!-- CSS -->
+
+<link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+<link rel="stylesheet" href="css/owl.carousel.min.css">
+<link rel="stylesheet" href="css/magnific-popup.css">
+<link rel="stylesheet" href="css/select2.min.css">
+<link rel="stylesheet" href="css/paymentfont.min.css">
+<link rel="stylesheet" href="css/slider-radio.css">
+<link rel="stylesheet" href="css/plyr.css">
+<link rel="stylesheet" href="css/main.css"> 
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" href="icon/favicon-32x32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icon/favicon-32x32.png">
+
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="Dmitry Volkov">
+<title>TrackShare</title>
+
+</head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<body>
+
+<header th:replace="header.html :: header"></header>
+<aside th:replace="sidebar.html :: aside"></aside>
+
+	<!-- <table>
+		<tr>
+		<td>이름</td>
+		<td>프로필</td>
+	
+		
+		
+		<tr th:each="track :${track}">
+			<td ><a th:href="@{playListView(mId=${track.tsMid})}" th:text="${track.mName}"></a></td>
+			<td><img th:src="@{/profile/{aa}(aa=${track.mProfileName})}" style="width:200px;"></td>
+			
+		</tr>
+		
+		
+	</table> -->
+<main class="main">
+		<div class="container-fluid">
+<section class="row row--grid">
+				<!-- title -->
+				<div class="col-12">
+					<div class="main__title">
+						<h2>PlayList</h2>
+
+					</div>
+				</div>
+				<!-- end title -->
+
+				<div class="col-6 col-sm-4 col-lg-2" th:each="track :${track}">
+					<div class="album">
+						<div class="album__cover">
+							<img th:src="@{/profile/{aa}(aa=${track.mProfileName})}" style="width:200px;">
+							<a th:href="@{playListView(mId=${track.tsMid})}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"/></svg></a>
+						
+						</div>
+						<div class="album__title" style="text-align: center;">
+							<h3><a th:href="@{playListView(mId=${track.tsMid})}" th:text="${track.mName}"></a><span>님의 재생목록</span></h3>
+							
+						</div>
+					</div>
+				</div>
+
+	
+			</section>
+			</div>
+			</main>
+			<footer th:replace="footer.html :: footer"></footer>
+</body>
+
+<!-- end main content -->
+</html>

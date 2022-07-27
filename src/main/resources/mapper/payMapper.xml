@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.icia.musicwired.dao.PayDAO">
+	
+<!-- 장바구니에서 결제할때 결제정보 저장하는 메소드 -->
+	<insert id="payInsert" parameterType="Pay">
+		INSERT INTO PAY VALUES(PAY_SEQ.NEXTVAL,#{pMuCode},#{pbMid},#{psMid},500,SYSDATE)
+	</insert>
+	
+<!-- 결제 후 장바구니에 있는 상품 삭제하는 메소드 -->
+	<delete id="payCartAllDelete" parameterType="Pay">
+		DELETE FROM CART WHERE CAMID = #{psMid}
+	</delete>
+	
+<!-- 결제 후 결제금액을 각 가수(판매자)에게 전달하는 메소드 -->
+	<update id="payMoneyAdd" parameterType="Pay">
+		UPDATE MEMBER SET MPOINT = MPOINT+500 WHERE MID = #{pbMid}
+	</update>
+		
+<!-- 결제 후 장바구니에 상품이 있는지 다시 검색하는 메소드 -->
+	<select id="PayInsertAfterCartList" parameterType="Pay" resultType="audio">
+		SELECT M.MUCODE, M.MUSINGER, M.MUNAME, M.MUGANRE, M.MUDATE, M.MUIMAGE, M.MULYRICS, M.MUHIT, M.MUPRICE, M.MFILE
+		FROM CART C, MUSIC M
+		WHERE M.MUCODE = C.CAMUCODE AND CAMID = #{psMid}
+	</select>
+	
+<!-- 해당 음악을 결제했는지 확인하는 메소드 -->
+	<select id="PayInCheck" parameterType="Pay" resultType="Pay">
+		SELECT * FROM PAY WHERE PMUCODE = #{pMuCode} AND PSMID = #{psMid}
+	</select>
+	
+<!-- 구매목록 페이지 출력 메소드 -->
+	<select id="buyList" parameterType="String" resultType="audio">
+		SELECT M.MUCODE, M.MUSINGER, M.MUNAME, M.MUGANRE, M.MUDATE, M.MUIMAGE, M.MUHIT, M.MUPRICE, M.MFILE, M.MULYRICS, M.MULIKE, P.PDATE, P.PCODE
+  		FROM PAY P, MUSIC M
+  		WHERE P.PMUCODE = M.MUCODE AND PSMID = #{psMid} ORDER BY P.PCODE DESC
+	</select>
+	
+<!-- 음원목록에서 바로 구매할 경우 작동하는 메소드 -->
+	<insert id="selestPayInsert" parameterType="Pay">
+		INSERT INTO PAY VALUES(PAY_SEQ.NEXTVAL,#{pMuCode},#{pbMid},#{psMid},500,SYSDATE)
+	</insert>
+</mapper>

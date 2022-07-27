@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<head>	
+
+<link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	<link rel="stylesheet" href="css/select2.min.css">
+	<link rel="stylesheet" href="css/paymentfont.min.css">
+	<link rel="stylesheet" href="css/slider-radio.css">
+	<link rel="stylesheet" href="css/plyr.css">
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="icon" type="image/png" href="icon/favicon-32x32.png" sizes="32x32">
+	<link rel="apple-touch-icon" href="icon/favicon-32x32.png">
+
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta name="author" content="Dmitry Volkov">
+
+
+</head>
+<body>
+  
+    
+ <header th:replace="header.html :: header"></header>
+<aside th:replace="sidebar.html :: aside"></aside>
+
+<div class="main">
+
+<h2 style="color:white;">회원 아이디 검색</h2>
+            <div class="header__search">
+			<input id="search" type="text" name="keyword" placeholder="Search">
+				<button type="submit" id="searchBtn" class="searchBtn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.71,20.29,18,16.61A9,9,0,1,0,16.61,18l3.68,3.68a1,1,0,0,0,1.42,0A1,1,0,0,0,21.71,20.29ZM11,18a7,7,0,1,1,7-7A7,7,0,0,1,11,18Z"/></svg></button>
+				<button type="button" class="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.41,12l6.3-6.29a1,1,0,1,0-1.42-1.42L12,10.59,5.71,4.29A1,1,0,0,0,4.29,5.71L10.59,12l-6.3,6.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l6.29,6.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+			</div>
+					 
+
+<div class="row row--grid">
+		<div class="col-12" id ="resultArea">
+			<div class="dashbox" >
+				<div class="dashbox__table-wrap"  >
+					<div class="dashbox__table-scroll">
+
+<table class="main__table">
+		<caption th:text="'회원목록'"></caption>
+		<tr>
+			<th class="main__table-text">아이디</th>
+			<th class="main__table-text">이름</th>
+			<th class="main__table-text">이메일</th>
+			<th class="main__table-text">성별</th>
+			<th class="main__table-text">삭제</th>
+		</tr>
+		
+		
+		<tr th:each="list:${member}">
+			<td class="main__table-text main__table-text--number"th:text="${list.mId}"></td>
+			<td class="main__table-text" th:text="${list.mName}"></td>
+			<td class="main__table-text" th:text="${list.mEmail}"></td>
+			<td class="main__table-text" th:text="${list.mGender}"></td>
+			<td class="main__table-text"><a th:href="@{memberDelete(mId=${list.mId})}" th:text="삭제"></a></td>
+		</tr>
+</table>
+					
+					</div>
+					</div>
+				</div> 	
+			</div>
+		</div>
+	</div>
+<!-- <div class="main__table-text main__table-text--green">
+	<code th:if="${paging.page <= 1}" th:text="이전"></code>
+	<code th:if="${paging.page > 1}">
+    <a th:href="@{songSearch(page=${paging.page-1},limit=${paging.limit},keyword=${paging.mId})}" th:text="이전"></a>
+	</code>
+
+	<th:block th:each="i : ${#numbers.sequence(paging.startPage , paging.endPage)}">
+    <code  th:if= "${paging.page eq i}" th:text="${i}"></code>
+    <a th:unless="${paging.page eq i}" th:href="@{songSearch(page=${i},limit=${paging.limit},keyword=${paging.mId})}" ><code th:text="${i}"></code></a>
+	</th:block>
+	<code th:if="${paging.page >= paging.maxPage}" th:text="다음"></code>
+	<code th:if="${paging.page < paging.maxPage}">
+    <a th:href="@{songSearch(page=${paging.page+1},limit=${paging.limit},keyword=${paging.mId})}" th:text="다음"></a>
+	</code>
+  </div>
+</div> -->
+
+</body>
+<script type="text/javascript" th:inline="javascript">
+
+		
+		$("#searchBtn").click(function(){
+			
+			var searchId = $('#search').val();
+			console.log("searchId" + searchId);
+			
+			$.ajax({
+				type : "POST",
+				url : "ajaxIdSearch",
+				data : {"mId" : searchId},
+				dataType : "json",
+				success : function(list){
+					memberList(list);
+				},
+				error : function(){
+					alert('실패당당당');
+				}
+			});
+			function memberList(list){
+				var output = "";
+					
+					output += "<div class='dashbox'>";
+					output += "<div class='dashbox_table-wrap'>"; 
+					output += "<div class='dashbox_table-scroll'>"; 
+					output += "<table class='main__table'>";
+					output += "<tr>";
+					output += "<th class='main__table-text'>아이디</th>";
+					output += "<th class='main__table-text'>이름</th>";
+					output += "<th class='main__table-text'>이메일</th>";
+					output += "<th class='main__table-text'>성별</th>";
+					output += "<th class='main__table-text'>삭제</th>";
+					output += "</tr>";
+				for(var i in list){
+				
+					
+					
+					output += "<tr>";
+					output += "<td class='main__table-text main__table-text--number'>" + list[i].mId + "</td>";
+					output += "<td class='main__table-text'>"+ list[i].mName + "</td>";
+					output += "<td class='main__table-text'>"+ list[i].mEmail + "</td>";
+					output += "<td class='main__table-text'>"+ list[i].mGender + "</td>";
+					output += "<td class='main__table-text'><a href='memberDelete?mId=" + list[i].mId + "'>삭제</a></td>";
+					output += "</tr>";
+					
+				}
+				output += "<table>";
+			 	output += "</div>";
+				output += "</div>";  
+				output += "</div>";
+				var resulttArea = document.getElementById('resultArea');
+				resultArea.innerHTML = output;
+			}
+			
+		});
+		
+	
+</script>
+</html>
